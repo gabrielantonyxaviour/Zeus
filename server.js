@@ -24,7 +24,7 @@ app.get("/profile/:address", async (req, res) => {
   try {
     const { address } = req.params;
     const profile = await pool.query(
-      "SELECT * FROM profiles WHERE wallet_address=$(1)",
+      `SELECT * FROM profiles WHERE wallet_address = '$(1)'`,
       [address]
     );
     res.json(profile.rows[0]);
