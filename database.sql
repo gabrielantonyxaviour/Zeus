@@ -1,9 +1,9 @@
 CREATE DATABASE my_database;
 
-CREATE TABLE game_codes (
-    id SERIAL PRIMARY KEY,
-    profile VARCHAR(255) REFERENCES profiles(wallet_address),
-    challenge BIGINT
+CREATE TABLE games (
+    profile VARCHAR(255) PRIMARY KEY REFERENCES profiles(wallet_address),
+    socketid VARCHAR(255),
+    bet INT
 );
 
 CREATE TABLE profiles (

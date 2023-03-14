@@ -66,10 +66,9 @@ app.get("/profile/following/:address", async (req, res) => {
 app.get("/getGames", async (req, res) => {
   try {
     const { capAmount } = req.body;
-    const games = await pool.query(
-      "SELECT * FROM game_codes WHERE challenge <= $(1)",
-      [capAmount]
-    );
+    const games = await pool.query("SELECT * FROM games WHERE bet <= $(1)", [
+      capAmount,
+    ]);
     res.json(games.rows);
   } catch (err) {
     console.log(err);
@@ -79,10 +78,10 @@ app.get("/getGames", async (req, res) => {
 // Create a game
 app.post("/createGame", async (req, res) => {
   try {
-    const { walletAddress, bet } = req.body;
+    const { walletAddress, bet, socketid } = req.body;
     const newGame = await pool.query(
-      "INSERT INTO game_codes (profile,challenge) VALUES ($(1),$(2)) RETURNING *",
-      [walletAddress, bet]
+      "INSERT INTO games (profile,socketid,bet) VALUES ($(1),$(2),$(3)) RETURNING *",
+      [walletAddress, socketid, bet]
     );
     res.json(newGame.rows[0]);
   } catch (err) {
@@ -95,7 +94,7 @@ app.post("/deleteGame", async (req, res) => {
   try {
     const { address } = req.body;
     const deletedGames = await pool.query(
-      "DELETE FROM game_codes WHERE profile=$(1)",
+      "DELETE FROM games WHERE profile=$(1)",
       [address]
     );
     res.json(deletedGames.rows);
@@ -110,7 +109,7 @@ app.post("/createProfile", async (req, res) => {
     const { address, name, image_url, description } = req.body;
     const profile = await pool.query(
       "INSERT INTO profiles (wallet_address,name,image,description) VALUES ($(1),$(2),$(3),$(4)) RETURNING *",
-      [address, name, image, description]
+      [address, name, image_url, description]
     );
     res.json(profile.rows[0]);
   } catch (err) {
