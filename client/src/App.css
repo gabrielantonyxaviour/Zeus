@@ -6,6 +6,23 @@ a {
   color: #ffffff;
 }
 
+/* width */
+::-webkit-scrollbar {
+  height: 3px;
+  width: 3px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #ff3131;
+  border-radius: 10px;
+}
+
 /* Homepage */
 .Homepage {
   background-image: url("./assets/Landing-Page.gif");

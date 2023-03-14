@@ -4,11 +4,15 @@ import { Switch, Route } from "react-router-dom";
 import Homepage from "./pages/Homepage";
 import Game from "./pages/Game";
 import AvailableGames from "./pages/AvailableGames";
+import YourProfile from "./pages/YourProfile";
+import YourFriends from "./pages/YourFriends";
 const App = () => {
   return (
     <Switch>
       <Route exact path="/" component={Homepage} />
       <Route exact path="/play" component={Game} />
+      <Route exact path="/profile/:address" component={YourProfile} />
+      <Route exact path="/friends/:address" component={YourFriends} />
       <Route exact path="/games" component={AvailableGames} />
     </Switch>
   );

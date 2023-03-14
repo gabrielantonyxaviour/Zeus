@@ -1,6 +1,6 @@
 import React from "react";
 
-const GameElement = ({ name, image, bet, address }) => {
+const FriendElement = ({ name, image, description, address }) => {
   return (
     <div className="flex justify-center">
       <div
@@ -15,14 +15,14 @@ const GameElement = ({ name, image, bet, address }) => {
             width={80}
           ></img>
           <div className="flex flex-col ml-5 text-left justify-center">
-            <p className="text-slate-600 mb-1">{name}</p>
-            <p>{address}</p>
+            <p className="text-slate-600 ">{name}</p>
+            <p className="text-sm">{address}</p>
+            <p className="text-sm text-black">{description}</p>
           </div>
         </div>
-        <button className="game-button green">{`Stake 💸 ${bet} TST `}</button>
       </div>
     </div>
   );
 };
 
-export default GameElement;
+export default FriendElement;

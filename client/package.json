@@ -10,8 +10,6 @@
     "@testing-library/user-event": "^13.2.1",
     "buffer": "^6.0.3",
     "ethers": "^5.7.2",
-    "pg": "^8.10.0",
-    "pg-hstore": "^2.3.4",
     "query-string": "^6.14.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
