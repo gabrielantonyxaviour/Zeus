@@ -7,7 +7,7 @@ const YourProfile = () => {
     address: address,
     image: "https://picsum.photos/200/200",
     name: "Gabriel",
-    description: "I am the hottest man on earth",
+    description: "I am a newbie in this game",
   };
   return (
     <div className="Homepage select-none">
