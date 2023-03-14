@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import FriendElement from "../components/FriendElement";
-import GameElement from "../components/GameElement";
 
 const YourFriends = () => {
   const { address } = useParams();

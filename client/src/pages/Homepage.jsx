@@ -8,6 +8,7 @@ import { disconnect } from "@wagmi/core";
 const Homepage = () => {
   const [roomCode, setRoomCode] = useState("");
   const { address, isConnected } = useAccount();
+
   const { data: balance, isFetched } = useBalance({
     address,
   });
@@ -38,10 +39,7 @@ const Homepage = () => {
             </div>
             <div className="flex justify-center ">
               <Link to={`/games`}>
-                <button
-                  className="game-button orange"
-                  onClick={console.log("CLICKED!!!!!!!!!")}
-                >
+                <button className="game-button orange" onClick={() => {}}>
                   START GAME
                 </button>
               </Link>

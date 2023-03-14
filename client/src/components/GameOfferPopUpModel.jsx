@@ -29,7 +29,7 @@ const GameOfferPopUpModel = ({
         <div className="flex justify-between">
           <p className="my-auto  text-white mx-auto text-xl">{name}</p>
           <p className="game-button blue" style={{ cursor: "default" }}>
-            Bet 💸 {bet}
+            Bet 💸 {bet} TST
           </p>
         </div>
         <div className="flex justify-around">

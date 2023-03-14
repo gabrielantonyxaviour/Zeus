@@ -23,7 +23,6 @@ import gameOverSound from "../assets/sounds/game-over-sound.mp3";
 
 let socket;
 const ENDPOINT = "http://localhost:5000";
-// const ENDPOINT = 'https://uno-online-multiplayer.herokuapp.com/'
 
 const Game = (props) => {
   const data = queryString.parse(props.location.search);
@@ -39,6 +38,7 @@ const Game = (props) => {
   useEffect(() => {
     const connectionOptions = {
       forceNew: true,
+      reconnect: true,
       reconnectionAttempts: "Infinity",
       timeout: 10000,
       transports: ["websocket"],

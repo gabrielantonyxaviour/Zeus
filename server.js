@@ -12,6 +12,81 @@ const server = http.createServer(app);
 const io = socketio(server);
 const { pool } = require("./db");
 
+io.on("connection", (socket) => {
+  console.log("Client connected " + socket.id);
+  socket.on("join", (payload, callback) => {
+    let numberOfUsersInRoom = getUsersInRoom(payload.room).length;
+
+    const { error, newUser } = addUser({
+      id: socket.id,
+      name: numberOfUsersInRoom === 0 ? "Player 1" : "Player 2",
+      room: payload.room,
+    });
+
+    if (error) return callback(error);
+
+    socket.join(newUser.room);
+
+    io.to(newUser.room).emit("roomData", {
+      room: newUser.room,
+      users: getUsersInRoom(newUser.room),
+    });
+    socket.emit("currentUserData", { name: newUser.name });
+    callback();
+  });
+
+  socket.on("initGameState", (gameState) => {
+    const user = getUser(socket.id);
+    if (user) io.to(user.room).emit("initGameState", gameState);
+  });
+
+  socket.on("updateGameState", (gameState) => {
+    const user = getUser(socket.id);
+    if (user) io.to(user.room).emit("updateGameState", gameState);
+  });
+
+  socket.on("sendMessage", (payload, callback) => {
+    const user = getUser(socket.id);
+    io.to(user.room).emit("message", {
+      user: user.name,
+      text: payload.message,
+    });
+    callback();
+  });
+
+  socket.on("offer", (payload, callback) => {
+    const { creatorSocketId, name, bet, accepterSocketId } = payload;
+    console.log(payload);
+    console.log(socket.id);
+    if (creatorSocketId == socket.id) {
+      io.to(creatorSocketId).emit("popup", {
+        from: accepterSocketId,
+        name,
+        bet,
+      });
+    }
+  });
+  socket.on("accept", (payload, callback) => {
+    const { opponentSocketId, roomCode, bet } = payload;
+    if (opponentSocketId == socket.id) {
+      io.to(socket.id).emit("accept", {
+        roomCode,
+        bet,
+      });
+    }
+  });
+
+  socket.on("disconnect", () => {
+    const user = removeUser(socket.id);
+    console.log("DISCONNECTED!");
+    if (user)
+      io.to(user.room).emit("roomData", {
+        room: user.room,
+        users: getUsersInRoom(user.room),
+      });
+  });
+});
+
 // MIDDLEWARES
 app.use(cors());
 app.use(bodyParser.json());
@@ -24,7 +99,7 @@ app.get("/profile/:address", async (req, res) => {
   try {
     const { address } = req.params;
     const profile = await pool.query(
-      `SELECT * FROM profiles WHERE wallet_address = '$(1)'`,
+      `SELECT * FROM profiles WHERE wallet_address = $1`,
       [address]
     );
     res.json(profile.rows[0]);
@@ -63,12 +138,11 @@ app.get("/profile/following/:address", async (req, res) => {
 });
 
 // Get current Games
-app.get("/getGames", async (req, res) => {
+app.get("/games", async (req, res) => {
   try {
-    const { capAmount } = req.body;
-    const games = await pool.query("SELECT * FROM games WHERE bet <= $(1)", [
-      capAmount,
-    ]);
+    const games = await pool.query(
+      "SELECT g.profile,g.socketid,g.bet,p.name,p.image from games g inner join profiles p on g.profile = p.wallet_address"
+    );
     res.json(games.rows);
   } catch (err) {
     console.log(err);
@@ -76,13 +150,15 @@ app.get("/getGames", async (req, res) => {
 });
 
 // Create a game
-app.post("/createGame", async (req, res) => {
+app.post("/games", async (req, res) => {
   try {
     const { walletAddress, bet, socketid } = req.body;
     const newGame = await pool.query(
-      "INSERT INTO games (profile,socketid,bet) VALUES ($(1),$(2),$(3)) RETURNING *",
+      "INSERT INTO games (profile, socketid, bet) VALUES ($1,$2,$3) RETURNING *",
       [walletAddress, socketid, bet]
     );
+    // console.log(req.body);
+
     res.json(newGame.rows[0]);
   } catch (err) {
     console.log(err.message);
@@ -174,57 +250,6 @@ app.post("/unfollowProfile", async (req, res) => {
   }
 });
 
-io.on("connection", (socket) => {
-  socket.on("join", (payload, callback) => {
-    let numberOfUsersInRoom = getUsersInRoom(payload.room).length;
-
-    const { error, newUser } = addUser({
-      id: socket.id,
-      name: numberOfUsersInRoom === 0 ? "Player 1" : "Player 2",
-      room: payload.room,
-    });
-
-    if (error) return callback(error);
-
-    socket.join(newUser.room);
-
-    io.to(newUser.room).emit("roomData", {
-      room: newUser.room,
-      users: getUsersInRoom(newUser.room),
-    });
-    socket.emit("currentUserData", { name: newUser.name });
-    callback();
-  });
-
-  socket.on("initGameState", (gameState) => {
-    const user = getUser(socket.id);
-    if (user) io.to(user.room).emit("initGameState", gameState);
-  });
-
-  socket.on("updateGameState", (gameState) => {
-    const user = getUser(socket.id);
-    if (user) io.to(user.room).emit("updateGameState", gameState);
-  });
-
-  socket.on("sendMessage", (payload, callback) => {
-    const user = getUser(socket.id);
-    io.to(user.room).emit("message", {
-      user: user.name,
-      text: payload.message,
-    });
-    callback();
-  });
-
-  socket.on("disconnect", () => {
-    const user = removeUser(socket.id);
-    if (user)
-      io.to(user.room).emit("roomData", {
-        room: user.room,
-        users: getUsersInRoom(user.room),
-      });
-  });
-});
-
 //serve static assets in production
 if (process.env.NODE_ENV === "production") {
   //set static folder
@@ -233,7 +258,10 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
-
+// io.listen(8080, () => {
+//   console.log("IO listening on port 8080");
+// });
+io.listen(8080);
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

@@ -7,7 +7,6 @@ CREATE TABLE games (
 );
 
 CREATE TABLE profiles (
-    id SERIAL PRIMARY KEY,
     wallet_address VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255),
     image VARCHAR(255),
@@ -19,3 +18,5 @@ CREATE TABLE follows (
     user_wallet_address VARCHAR(255) REFERENCES profiles(wallet_address),
     follower_wallet_address VARCHAR(255) REFERENCES profiles(wallet_address)
 );
+
+SELECT g.profile,g.socketid,g.bet,p.name,p.image from games g inner join profiles p on g.profile = p.wallet_address;
