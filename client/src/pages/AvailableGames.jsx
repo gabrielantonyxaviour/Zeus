@@ -54,7 +54,7 @@ const AvailableGames = () => {
     {
       id: 3,
       address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-      name: "Jasmine",
+      name: "Marshmallow",
       profile: "https://picsum.photos/200/200",
       bet: 30,
     },
@@ -103,7 +103,14 @@ const AvailableGames = () => {
               <p className=" mx-3 text-lg" style={{ display: "inline" }}>
                 {bet} TST
               </p>
-              <button className="game-button green">Choose Bet</button>
+              <button
+                className="game-button green"
+                onClick={() => {
+                  setShowModel(true);
+                }}
+              >
+                Choose Bet
+              </button>
             </div>
           ) : (
             <p>Loading...</p>
