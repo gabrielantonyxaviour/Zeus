@@ -3,7 +3,14 @@ const socketio = require("socket.io");
 const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom,
+  stakeUser,
+  isEveryoneStaked,
+} = require("./users");
 const path = require("path");
 const PORT = process.env.PORT || 5000;
 
@@ -11,28 +18,48 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 const { pool } = require("./db");
+const { addGame, getGame } = require("./games");
 
 io.on("connection", (socket) => {
   console.log("Client connected " + socket.id);
+
   socket.on("join", (payload, callback) => {
-    let numberOfUsersInRoom = getUsersInRoom(payload.room).length;
+    if (getUser(socket.id) != undefined) {
+      return callback("Already in ");
+    }
 
     const { error, newUser } = addUser({
       id: socket.id,
-      name: numberOfUsersInRoom === 0 ? "Player 1" : "Player 2",
+      // name: numberOfUsersInRoom === 0 ? "Player 1" : "Player 2",
+      name: payload.name,
+      address: payload.address,
       room: payload.room,
+      bet: getGame(payload.room).bet,
+      isStaked: false,
     });
-
+    console.log(newUser);
     if (error) return callback(error);
 
     socket.join(newUser.room);
 
     io.to(newUser.room).emit("roomData", {
       room: newUser.room,
+      bet: getGame(payload.room).bet,
       users: getUsersInRoom(newUser.room),
     });
     socket.emit("currentUserData", { name: newUser.name });
     callback();
+  });
+
+  socket.on("stake", ({ address, room }) => {
+    stakeUser({ address, room });
+    if (isEveryoneStaked(room)) {
+      io.to(room).emit("startGame", {});
+    } else {
+      io.to(room).emit("stake", {
+        address,
+      });
+    }
   });
 
   socket.on("initGameState", (gameState) => {
@@ -58,22 +85,21 @@ io.on("connection", (socket) => {
     const { creatorSocketId, name, bet, accepterSocketId } = payload;
     console.log(payload);
     console.log(socket.id);
-    if (creatorSocketId == socket.id) {
-      io.to(creatorSocketId).emit("popup", {
-        from: accepterSocketId,
-        name,
-        bet,
-      });
-    }
+    io.to(creatorSocketId).emit("popup", {
+      from: accepterSocketId,
+      name,
+      bet,
+    });
   });
   socket.on("accept", (payload, callback) => {
     const { opponentSocketId, roomCode, bet } = payload;
-    if (opponentSocketId == socket.id) {
-      io.to(socket.id).emit("accept", {
-        roomCode,
-        bet,
-      });
-    }
+    const { newGame } = addGame({ room: roomCode, bet });
+    console.log(newGame);
+    console.log(payload);
+    io.to(opponentSocketId).emit("accept", {
+      roomCode,
+      bet,
+    });
   });
 
   socket.on("disconnect", () => {
@@ -102,6 +128,8 @@ app.get("/profile/:address", async (req, res) => {
       `SELECT * FROM profiles WHERE wallet_address = $1`,
       [address]
     );
+    console.log("Fetching Profile!!!");
+    console.log(profile.rows[0]);
     res.json(profile.rows[0]);
   } catch (err) {
     console.log("ERROR OCCUREED!!!");
@@ -114,7 +142,7 @@ app.get("/profile/followers/:address", async (req, res) => {
   try {
     const { address } = req.params;
     const profile = await pool.query(
-      "SELECT * FROM follows WHERE user_walllet_address=$(1)",
+      "SELECT * FROM follows WHERE user_walllet_address=$1",
       [address]
     );
     res.json(profile.rows[0]);
@@ -128,10 +156,24 @@ app.get("/profile/following/:address", async (req, res) => {
   try {
     const { address } = req.params;
     const profile = await pool.query(
-      "SELECT * FROM follows WHERE follower_wallet_address=$(1)",
+      "SELECT * FROM follows WHERE follower_wallet_address=$1",
       [address]
     );
     res.json(profile.rows[0]);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+// Get bet for a game
+app.get("/bet/:address", async (req, res) => {
+  try {
+    const { address } = req.params;
+    const bet = await pool.query("SELECT bet FROM games WHERE profile=$1", [
+      address,
+    ]);
+    console.log(bet.rows[0]);
+    res.json(bet.rows[0]);
   } catch (err) {
     console.log(err);
   }

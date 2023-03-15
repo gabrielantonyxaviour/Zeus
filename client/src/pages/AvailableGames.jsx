@@ -4,6 +4,8 @@ import { useAccount, useBalance } from "wagmi";
 import GameOfferPopUpModel from "../components/GameOfferPopUpModel";
 import io from "socket.io-client";
 import NormalPopup from "../components/NormalPopup";
+import randomCodeGenerator from "../utils/randomCodeGenerator";
+
 let socket;
 const ENDPOINT = "http://localhost:8080";
 const AvailableGames = () => {
@@ -14,6 +16,7 @@ const AvailableGames = () => {
   const [profile, setProfile] = useState({});
   const [offerName, setOfferName] = useState("");
   const [offerPrice, setOfferPrice] = useState(0);
+  const [offerSocketId, setOfferSocketId] = useState("");
   const sampleData = [
     {
       id: 1,
@@ -102,9 +105,30 @@ const AvailableGames = () => {
 
   useEffect(() => {
     socket.on("popup", ({ from, name, bet }) => {
+      setOfferSocketId(from);
       setOfferName(name);
       setOfferPrice(bet);
       setShowModel(true);
+    });
+
+    socket.on("accept", async ({ roomCode, bet }) => {
+      try {
+        const body = {
+          walletAddress: address,
+          bet,
+          socketid: String(socket.id),
+        };
+        console.log(body);
+        const response = await fetch("http://localhost:5000/games", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        console.log(response);
+      } catch (err) {
+        console.error(err.message);
+      }
+      window.location = `/play?roomCode=${roomCode}`;
     });
   }, []);
   return (
@@ -121,12 +145,14 @@ const AvailableGames = () => {
               <input
                 type="range"
                 min="1"
-                max={balance.formatted - 1}
-                // max="20"
+                // max={balance.formatted - 1}
+                max="20"
                 step="1"
                 value={bet}
                 style={{ accentColor: "yellow" }}
                 onChange={(e) => {
+                  console.log(socket.id);
+
                   setBet(e.target.value);
                 }}
               />
@@ -222,6 +248,13 @@ const AvailableGames = () => {
           setShowModel(false);
         }}
         onAccept={() => {
+          let roomCode = randomCodeGenerator(7);
+          socket.emit("accept", {
+            opponentSocketId: offerSocketId,
+            roomCode,
+            bet,
+          });
+          window.location = `/play?roomCode=${roomCode}`;
           setShowModel(false);
         }}
         onReject={() => {
