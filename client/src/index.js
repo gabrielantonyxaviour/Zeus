@@ -57,22 +57,22 @@ const wagmiClient = createClient({
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Router>
-      <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider
-          coolMode
-          chains={chains}
-          theme={darkTheme({
-            accentColor: "#4CBB17",
-            accentColorForeground: "white",
-            borderRadius: "medium",
-            fontStack: "rounded",
-            overlayBlur: "small",
-          })}
-        >
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider
+        coolMode
+        chains={chains}
+        theme={darkTheme({
+          accentColor: "#4CBB17",
+          accentColorForeground: "white",
+          borderRadius: "medium",
+          fontStack: "rounded",
+          overlayBlur: "small",
+        })}
+      >
+        <Router>
           <App />
-        </RainbowKitProvider>
-      </WagmiConfig>
-    </Router>
+        </Router>
+      </RainbowKitProvider>
+    </WagmiConfig>
   </React.StrictMode>
 );
