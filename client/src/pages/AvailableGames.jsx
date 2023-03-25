@@ -5,10 +5,67 @@ import GameOfferPopUpModel from "../components/GameOfferPopUpModel";
 import io from "socket.io-client";
 import NormalPopup from "../components/NormalPopup";
 import randomCodeGenerator from "../utils/randomCodeGenerator";
+import { usePolybase, useDocument } from "@polybase/react";
 
 let socket;
 const ENDPOINT = "http://localhost:8080";
+
+const sampleData = [
+  {
+    id: 1,
+    address: "0xE2172c474F2E95419754140d4ac19045A70Bc93F",
+    name: "Gabriel",
+    profile: "https://picsum.photos/200/200",
+    bet: 3,
+  },
+  {
+    id: 2,
+    address: "0x2994E3240D7bb19A890a449A5dc8DDC374d3C08a",
+    name: "Benita",
+    profile: "https://picsum.photos/200/200",
+    bet: 12,
+  },
+  {
+    id: 3,
+    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
+    name: "Jasmine",
+    profile: "https://picsum.photos/200/200",
+    bet: 30,
+  },
+  {
+    id: 3,
+    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
+    name: "Jasmine",
+    profile: "https://picsum.photos/200/200",
+    bet: 30,
+  },
+  {
+    id: 3,
+    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
+    name: "Jasmine",
+    profile: "https://picsum.photos/200/200",
+    bet: 30,
+  },
+  {
+    id: 3,
+    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
+    name: "Jasmine",
+    profile: "https://picsum.photos/200/200",
+    bet: 30,
+  },
+  {
+    id: 3,
+    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
+    name: "Marshmallow",
+    profile: "https://picsum.photos/200/200",
+    bet: 30,
+  },
+];
+
 const AvailableGames = () => {
+  // Get prfile data from Polybase
+  const polybase = usePolybase();
+
   const [bet, setBet] = useState(1);
   const [showModel, setShowModel] = useState(false);
   const [showAcknowledge, setShowAcknowledge] = useState(false);
@@ -17,57 +74,7 @@ const AvailableGames = () => {
   const [offerName, setOfferName] = useState("");
   const [offerPrice, setOfferPrice] = useState(0);
   const [offerSocketId, setOfferSocketId] = useState("");
-  const sampleData = [
-    {
-      id: 1,
-      address: "0xE2172c474F2E95419754140d4ac19045A70Bc93F",
-      name: "Gabriel",
-      profile: "https://picsum.photos/200/200",
-      bet: 3,
-    },
-    {
-      id: 2,
-      address: "0x2994E3240D7bb19A890a449A5dc8DDC374d3C08a",
-      name: "Benita",
-      profile: "https://picsum.photos/200/200",
-      bet: 12,
-    },
-    {
-      id: 3,
-      address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-      name: "Jasmine",
-      profile: "https://picsum.photos/200/200",
-      bet: 30,
-    },
-    {
-      id: 3,
-      address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-      name: "Jasmine",
-      profile: "https://picsum.photos/200/200",
-      bet: 30,
-    },
-    {
-      id: 3,
-      address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-      name: "Jasmine",
-      profile: "https://picsum.photos/200/200",
-      bet: 30,
-    },
-    {
-      id: 3,
-      address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-      name: "Jasmine",
-      profile: "https://picsum.photos/200/200",
-      bet: 30,
-    },
-    {
-      id: 3,
-      address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-      name: "Marshmallow",
-      profile: "https://picsum.photos/200/200",
-      bet: 30,
-    },
-  ];
+
   const { address } = useAccount();
   const { data: balance, isFetched } = useBalance({
     address,
@@ -76,25 +83,27 @@ const AvailableGames = () => {
   useEffect(() => {
     (async function () {
       try {
-        const response1 = await fetch("http://localhost:5000/games");
-        setGames(await response1.json());
-        const response2 = await fetch(
-          "http://localhost:5000/profile/" + address
-        );
-        setProfile(await response2.json());
+        const profile_data = await polybase
+          .collection("Profiles")
+          .record(address)
+          .get();
+        setProfile(profile_data.data);
+
+        const games_data = await polybase.collection("Games").get();
+        setGames(games_data.data);
       } catch (err) {
         console.error(err.message);
       }
     })();
 
-    const connectionOptions = {
+    socket = io.connect(ENDPOINT, {
       reconnect: true,
       forceNew: true,
       reconnectionAttempts: "Infinity",
       timeout: 10000,
       transports: ["websocket"],
-    };
-    socket = io.connect(ENDPOINT, connectionOptions);
+    });
+
     //cleanup on component unmount
     return function cleanup() {
       socket.disconnect();
@@ -113,24 +122,17 @@ const AvailableGames = () => {
 
     socket.on("accept", async ({ roomCode, bet }) => {
       try {
-        const body = {
-          walletAddress: address,
-          bet,
-          socketid: String(socket.id),
-        };
-        console.log(body);
-        const response = await fetch("http://localhost:5000/games", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        console.log(response);
+        const newGameResponse = await polybase
+          .collection("Games")
+          .create([roomCode, address, String(socket.id), bet]);
+        console.log("New Game Response: ", newGameResponse);
       } catch (err) {
         console.error(err.message);
       }
       window.location = `/play?roomCode=${roomCode}`;
     });
   }, []);
+
   return (
     <div className="Homepage select-none">
       <div className="homepage-menu max-w-[1000px] mx-auto w-full text-center ">
@@ -152,7 +154,6 @@ const AvailableGames = () => {
                 style={{ accentColor: "yellow" }}
                 onChange={(e) => {
                   console.log(socket.id);
-
                   setBet(e.target.value);
                 }}
               />
@@ -162,23 +163,12 @@ const AvailableGames = () => {
               <button
                 className="game-button green"
                 onClick={async () => {
-                  let id = socket.id;
-                  console.log(id);
                   try {
-                    const body = {
-                      walletAddress: address,
-                      bet,
-                      socketid: String(id),
-                    };
-                    console.log(body);
-                    const response = await fetch(
-                      "http://localhost:5000/games",
-                      {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(body),
-                      }
-                    );
+                    const response = await polybase
+                      .collection("Games")
+                      .create([address, String(socket.id), bet]);
+                    console.log("New Game Response: ", response);
+
                     if (response) {
                       setShowAcknowledge(true);
                     }
@@ -199,13 +189,14 @@ const AvailableGames = () => {
           className="overflow-y-auto"
           style={{ height: window.innerHeight - 220 }}
         >
-          {games.map((val) => {
-            let name = val.name;
-            let image = val.image;
+          {games.map((val, index) => {
+            let name = val.id;
+            let image = "https://picsum.photos/200";
             let address = val.profile;
             let bet = val.bet;
+
             return (
-              <div className="flex justify-center">
+              <div className="flex justify-center" key={index}>
                 <div
                   className="game-button orange w-[80%] h-[100px] flex justify-between"
                   style={{ cursor: "default" }}
@@ -216,9 +207,10 @@ const AvailableGames = () => {
                       src={image}
                       height={80}
                       width={80}
+                      alt="profile"
                     ></img>
                     <div className="flex flex-col ml-5 text-left justify-center">
-                      <p className="text-slate-600 mb-1">{name}</p>
+                      <p className="text-slate-600 mb-1">{profile.name}</p>
                       <p>{address}</p>
                     </div>
                   </div>
@@ -227,13 +219,13 @@ const AvailableGames = () => {
                     onClick={() => {
                       socket.emit("offer", {
                         accepterSocketId: socket.id,
-                        creatorSocketId: val.socketid,
+                        creatorSocketId: val.data.socketid,
                         name: profile.name,
                         bet,
                       });
                       // console.log(socket.id);
                     }}
-                  >{`Stake 💸 ${bet} TST `}</button>
+                  >{`Stake 💸 ${val.data.bet} TST `}</button>
                 </div>
               </div>
             );

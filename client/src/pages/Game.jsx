@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { usePolybase, useDocument } from "@polybase/react";
+
 import PACK_OF_CARDS from "../utils/packOfCards";
 import shuffleArray from "../utils/shuffleArray";
 import io from "socket.io-client";
@@ -34,7 +36,7 @@ const ENDPOINT = "http://localhost:5000";
 const Game = (props) => {
   const data = queryString.parse(props.location.search);
 
-  //initialize socket state
+  // initialize socket states
   const [room, setRoom] = useState(data.roomCode);
   const [roomFull, setRoomFull] = useState(false);
   const [users, setUsers] = useState([]);
@@ -68,6 +70,10 @@ const Game = (props) => {
     isSuccess: stakeReturnDataIsSuccess,
     write: stake,
   } = useContractWrite(stakeConfig);
+
+  // Get prfile data from Polybase
+  const polybase = usePolybase();
+
   useEffect(() => {
     const connectionOptions = {
       forceNew: true,
@@ -80,11 +86,12 @@ const Game = (props) => {
 
     (async function () {
       try {
-        const response2 = await fetch(
-          "http://localhost:5000/profile/" + address
-        );
-        let res = await response2.json();
-        setName(res.name);
+        const profile_data = await polybase
+          .collection("Profiles")
+          .record(address)
+          .get();
+
+        setName(profile_data.data.name);
       } catch (err) {
         console.error(err.message);
       }
@@ -120,6 +127,7 @@ const Game = (props) => {
       socket.off();
     };
   }, []);
+
   useEffect(() => {
     if (stakeReturnDataIsSuccess) {
       socket.emit("stake", {
@@ -128,6 +136,7 @@ const Game = (props) => {
       });
     }
   }, [stakeReturnDataIsSuccess]);
+
   //initialize game state
   const [gameOver, setGameOver] = useState(true);
   const [winner, setWinner] = useState("");

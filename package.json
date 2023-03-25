@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/mizanxali/uno-online#readme",
   "dependencies": {
+    "@polybase/client": "^0.3.37",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",

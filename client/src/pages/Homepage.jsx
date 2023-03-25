@@ -5,19 +5,21 @@ import Logo from "../assets/logo.png";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useBalance } from "wagmi";
 import { disconnect } from "@wagmi/core";
+
 const Homepage = () => {
-  const [roomCode, setRoomCode] = useState("");
   const { address, isConnected } = useAccount();
 
   const { data: balance, isFetched } = useBalance({
     address,
   });
+
   //   const dataFetchedRef = useRef(false);
   //   useEffect(() => {
   //     if (dataFetchedRef.current) return;
   //     dataFetchedRef.current = true;
   //     fetchBalance(address).then((val)=>{})
   // },[])
+
   return (
     <div className="Homepage select-none">
       <div className="homepage-menu max-w-[1240px] mx-auto w-full text-center ">
@@ -37,12 +39,14 @@ const Homepage = () => {
                 <ConnectButton />
               </div>
             </div>
+
             <div className="flex justify-center ">
               <Link to={`/games`}>
                 <button className="game-button orange" onClick={() => {}}>
                   START GAME
                 </button>
               </Link>
+
               <Link to={`/profile/${address}`}>
                 <button className="game-button orange">YOUR PROFILE</button>
               </Link>

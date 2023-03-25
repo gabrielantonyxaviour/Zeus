@@ -70,9 +70,10 @@ const YourFriends = () => {
           className="overflow-y-auto"
           style={{ height: window.innerHeight - 220 }}
         >
-          {sampleData.map((val) => {
+          {sampleData.map((val, index) => {
             return (
               <FriendElement
+                key={index}
                 name={val.name}
                 image={val.profile}
                 address={val.address}

@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.1",
+    "@polybase/client": "^0.3.37",
+    "@polybase/react": "^0.3.38",
     "@rainbow-me/rainbowkit": "^0.12.1",
     "@tailwindcss/forms": "^0.5.3",
     "@testing-library/jest-dom": "^5.14.1",

@@ -5,12 +5,12 @@ const addGame = ({ room, bet }) => {
   console.log(games);
   const newGame = { room, bet };
   games.push(newGame);
+
   return { newGame };
 };
 
 const removeGame = (room) => {
   const removeIndex = games.findIndex((game) => game.room === room);
-
   if (removeIndex !== -1) return games.splice(removeIndex, 1)[0];
 };
 
