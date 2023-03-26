@@ -144,8 +144,11 @@ const AvailableGames = () => {
         const newGameResponse = await polybase
           .collection("Games")
           .record(String(senderSocketId))
-          .call("setRoomCode", [roomCode, address, profile.name]);
-        console.log("Setting Room Code for", newGameResponse);
+          .call("setRoomCode", [
+            roomCode,
+            address,
+            profile?.name || "Annonyms",
+          ]);
       } catch (err) {
         console.error(err.message);
       }

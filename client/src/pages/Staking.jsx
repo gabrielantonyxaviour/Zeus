@@ -27,16 +27,18 @@ const Staking = (props) => {
           setGameNotFound(true);
         } else {
           setGameNotFound(false);
-          let gameRecord = games.data[0];
+          let gameRecord = games.data[0].data;
+          console.log(gameRecord);
+
           setGameData(gameRecord);
 
-          if (gameRecord.player1 === address) {
+          if (gameRecord.player1_address === address) {
             console.log("You are player one");
-          } else if (gameRecord.player2 === address) {
+          } else if (gameRecord.player2_address === address) {
             console.log("You are player two");
           } else {
             console.log("You are not a player");
-            window.location.href = "/games";
+            // window.location.href = "/games";
           }
         }
       } catch (err) {
