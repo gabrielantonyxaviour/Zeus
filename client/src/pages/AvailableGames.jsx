@@ -90,6 +90,16 @@ const AvailableGames = () => {
         setProfile(profile_data.data);
 
         const games_data = await polybase.collection("Games").get();
+
+        for (let i = 0; i < games_data.data.length; i++) {
+          const profile_address = games_data.data[i].profile;
+          const profile_data = await polybase
+            .collection("Profiles")
+            .record(profile_address)
+            .get();
+          games_data.data[i].profile = profile_data.data;
+        }
+
         setGames(games_data.data);
       } catch (err) {
         console.error(err.message);
@@ -190,10 +200,8 @@ const AvailableGames = () => {
           style={{ height: window.innerHeight - 220 }}
         >
           {games.map((val, index) => {
-            let name = val.id;
             let image = "https://picsum.photos/200";
-            let address = val.profile;
-            let bet = val.bet;
+            let address = val.data.profile;
 
             return (
               <div className="flex justify-center" key={index}>
@@ -210,7 +218,9 @@ const AvailableGames = () => {
                       alt="profile"
                     ></img>
                     <div className="flex flex-col ml-5 text-left justify-center">
-                      <p className="text-slate-600 mb-1">{profile.name}</p>
+                      <p className="text-slate-600 mb-1">
+                        {val.data.profile.name}
+                      </p>
                       <p>{address}</p>
                     </div>
                   </div>
@@ -220,10 +230,15 @@ const AvailableGames = () => {
                       socket.emit("offer", {
                         accepterSocketId: socket.id,
                         creatorSocketId: val.data.socketid,
-                        name: profile.name,
-                        bet,
+                        name: val.data.profile,
+                        bet: val.data.bet,
                       });
-                      // console.log(socket.id);
+                      console.log({
+                        accepterSocketId: socket.id,
+                        creatorSocketId: val.data.socketid,
+                        name: profile.name,
+                        bet: val.data.bet,
+                      });
                     }}
                   >{`Stake 💸 ${val.data.bet} TST `}</button>
                 </div>
