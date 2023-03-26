@@ -74,6 +74,7 @@ const AvailableGames = () => {
   const [offerName, setOfferName] = useState("");
   const [offerPrice, setOfferPrice] = useState(0);
   const [offerSocketId, setOfferSocketId] = useState("");
+  const [profile, setProfile] = useState({});
 
   const { address } = useAccount();
   const { data: balance, isFetched } = useBalance({
@@ -83,6 +84,12 @@ const AvailableGames = () => {
   useEffect(() => {
     (async function () {
       try {
+        const profile_data = await polybase
+          .collection("Profiles")
+          .record(address)
+          .get();
+        setProfile(profile_data.data);
+
         const games_data = await polybase.collection("Games").get();
         console.log("games_data", games_data);
         setGames(games_data.data);
@@ -106,13 +113,14 @@ const AvailableGames = () => {
       // delete game record
       (async function () {
         console.log("Deleting game record", offerSocketId);
-        await polybase
-          .collection("Games")
-          .record(offerSocketId)
-          .call("del", [])
-          .catch((err) => {
-            console.error(err);
-          });
+        try {
+          await polybase
+            .collection("Games")
+            .record(offerSocketId)
+            .call("del", []);
+        } catch (err) {
+          console.log(err);
+        }
       })();
 
       //shut down connnection instance
@@ -128,13 +136,15 @@ const AvailableGames = () => {
       setOfferPrice(bet);
       setShowModel(true);
     });
+  }, [offerSocketId, offerName, offerPrice, showModel]);
 
+  useEffect(() => {
     socket.on("accept", async ({ roomCode, bet, senderSocketId }) => {
       try {
         const newGameResponse = await polybase
           .collection("Games")
           .record(String(senderSocketId))
-          .call("setRoomCode", [roomCode, address]);
+          .call("setRoomCode", [roomCode, address, profile.name]);
         console.log("Setting Room Code for", newGameResponse);
       } catch (err) {
         console.error(err.message);
@@ -177,7 +187,7 @@ const AvailableGames = () => {
                     console.log({ socketid: String(socket.id), address, bet });
                     const response = await polybase
                       .collection("Games")
-                      .create([String(socket.id), address, bet]);
+                      .create([String(socket.id), address, profile.name, bet]);
                     console.log("New Game Response: ", response);
 
                     if (response) {
@@ -202,7 +212,7 @@ const AvailableGames = () => {
         >
           {games.map((val, index) => {
             let image = "https://picsum.photos/200";
-            let address = val.data.profile.wallet_address;
+            let address = val.data.player1_address;
 
             return (
               <div className="flex justify-center" key={index}>
@@ -220,7 +230,7 @@ const AvailableGames = () => {
                     ></img>
                     <div className="flex flex-col ml-5 text-left justify-center">
                       <p className="text-slate-600 mb-1">
-                        {val.data.profile.name}
+                        {val.data.player1_name}
                       </p>
                       <p>{address}</p>
                     </div>
@@ -231,7 +241,13 @@ const AvailableGames = () => {
                       socket.emit("offer", {
                         accepterSocketId: socket.id,
                         creatorSocketId: val.data.id,
-                        name: val.data.profile.name,
+                        name: profile.name,
+                        bet: val.data.bet,
+                      });
+                      console.log("Test", {
+                        accepterSocketId: socket.id,
+                        creatorSocketId: val.data.id,
+                        name: profile.name,
                         bet: val.data.bet,
                       });
                     }}
