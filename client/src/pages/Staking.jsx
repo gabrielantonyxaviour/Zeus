@@ -3,6 +3,7 @@ import queryString from "query-string";
 import { usePolybase } from "@polybase/react";
 import { useAccount, useBalance, useNetwork } from "wagmi";
 import {
+  apiUrls,
   contractAddress,
   OxReceiverUNO_ABI,
   OxSenderUNO_ABI,
@@ -100,34 +101,35 @@ const Staking = (props) => {
       })();
     }
   }, [stakeReturnDataIsSuccess]);
-  useEffect(() => {
-    if (
-      gameData?.player1_isStaked === true &&
-      gameData?.player2_isStaked === true
-    ) {
-      console.log("Creating provider...");
-      const provider = new ethers.providers.JsonRpcProvider(
-        apiUrls[chain.id],
-        chain.id
-      );
-      console.log("Creating signer...");
-      const signer = new ethers.Wallet(
-        process.env.REACT_APP_PRIVATE_KEY,
-        provider
-      );
-      console.log("Creating contract...");
-      const OxReceiverUNO = new ethers.Contract(
-        contractAddress[chain.id],
-        OxReceiverUNO_ABI,
-        signer
-      );
-      console.log("Starting Game...");
 
-      await OxReceiverUNO.startGame(
-       roomCode
-      );
-      window.location = `/play?roomCode=${roomCode}`;
-    }
+  useEffect(() => {
+    (async function () {
+      if (
+        gameData?.player1_isStaked === true &&
+        gameData?.player2_isStaked === true
+      ) {
+        console.log("Creating provider...");
+        const provider = new ethers.providers.JsonRpcProvider(
+          apiUrls[chain.id],
+          chain.id
+        );
+        console.log("Creating signer...");
+        const signer = new ethers.Wallet(
+          process.env.REACT_APP_PRIVATE_KEY,
+          provider
+        );
+        console.log("Creating contract...");
+        const OxReceiverUNO = new ethers.Contract(
+          contractAddress[chain.id],
+          OxReceiverUNO_ABI,
+          signer
+        );
+        console.log("Starting Game...");
+
+        await OxReceiverUNO.startGame(roomCode);
+        window.location = `/play?roomCode=${roomCode}`;
+      }
+    })();
   }, [gameData]);
   useEffect(() => {
     (function () {
