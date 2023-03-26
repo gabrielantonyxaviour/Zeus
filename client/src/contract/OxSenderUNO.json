@@ -1,0 +1,226 @@
+[{
+    "inputs": [{
+        "internalType": "address",
+        "name": "_connext",
+        "type": "address"
+    }, {
+        "internalType": "address",
+        "name": "_weth",
+        "type": "address"
+    }],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+    }, {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+    }],
+    "name": "OwnershipTransferred",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+    }, {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "destinationDomain",
+        "type": "uint32"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "relayerFee",
+        "type": "uint256"
+    }],
+    "name": "xStaked",
+    "type": "event"
+}, {
+    "inputs": [{
+        "internalType": "uint32",
+        "name": "_destinationDomain",
+        "type": "uint32"
+    }, {
+        "internalType": "address",
+        "name": "_destinationUnwrapper",
+        "type": "address"
+    }, {
+        "internalType": "address",
+        "name": "_xUNOReceiver",
+        "type": "address"
+    }],
+    "name": "addChain",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [],
+    "name": "connext",
+    "outputs": [{
+        "internalType": "contract IConnext",
+        "name": "",
+        "type": "address"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+    }],
+    "name": "domainToReceiver",
+    "outputs": [{
+        "internalType": "address",
+        "name": "destinationUnwrapper",
+        "type": "address"
+    }, {
+        "internalType": "address",
+        "name": "xUNOReceiver",
+        "type": "address"
+    }, {
+        "internalType": "bool",
+        "name": "exists",
+        "type": "bool"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "uint32",
+        "name": "_destinationDomain",
+        "type": "uint32"
+    }],
+    "name": "getDestinationUnwrapper",
+    "outputs": [{
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "uint32",
+        "name": "_destinationDomain",
+        "type": "uint32"
+    }],
+    "name": "getDomain",
+    "outputs": [{
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }, {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "uint32",
+        "name": "_destinationDomain",
+        "type": "uint32"
+    }],
+    "name": "getxUNOReceiver",
+    "outputs": [{
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "uint32",
+        "name": "_destinationDomain",
+        "type": "uint32"
+    }],
+    "name": "isExists",
+    "outputs": [{
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+    }],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [],
+    "name": "weth",
+    "outputs": [{
+        "internalType": "contract IWETH",
+        "name": "",
+        "type": "address"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+    }, {
+        "internalType": "uint32",
+        "name": "destinationDomain",
+        "type": "uint32"
+    }, {
+        "internalType": "uint256",
+        "name": "relayerFee",
+        "type": "uint256"
+    }],
+    "name": "xStake",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+}]

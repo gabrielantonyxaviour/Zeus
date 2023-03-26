@@ -8,7 +8,7 @@ import randomCodeGenerator from "../utils/randomCodeGenerator";
 import { usePolybase, useDocument } from "@polybase/react";
 
 let socket;
-const ENDPOINT = "http://localhost:8080";
+const ENDPOINT = process.env.REACT_APP_SOCKET_URL || "http://localhost:8080";
 
 const sampleData = [
   {

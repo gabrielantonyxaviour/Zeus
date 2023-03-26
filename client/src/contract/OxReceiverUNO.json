@@ -1,0 +1,332 @@
+[{
+    "inputs": [{
+        "internalType": "uint256",
+        "name": "_royaltyPercentage",
+        "type": "uint256"
+    }],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "reward",
+        "type": "uint256"
+    }],
+    "name": "FundsRetreived",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "winner",
+        "type": "address"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "finishedAt",
+        "type": "uint256"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bet",
+        "type": "uint256"
+    }],
+    "name": "GameFinished",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startedAt",
+        "type": "uint256"
+    }],
+    "name": "GameStarted",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "player1",
+        "type": "address"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "player2",
+        "type": "address"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "createdAt",
+        "type": "uint256"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bet",
+        "type": "uint256"
+    }],
+    "name": "NewGameCreated",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+    }, {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+    }],
+    "name": "OwnershipTransferred",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "player",
+        "type": "address"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "stakedAt",
+        "type": "uint256"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "stake",
+        "type": "uint256"
+    }],
+    "name": "PlayerStaked",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [],
+    "name": "RoyaltiesClaimed",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+    }, {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "returnCode",
+        "type": "uint256"
+    }],
+    "name": "XCallFailed",
+    "type": "event"
+}, {
+    "anonymous": false,
+    "inputs": [{
+        "indexed": true,
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "indexed": false,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+    }],
+    "name": "XCallSuccessful",
+    "type": "event"
+}, {
+    "stateMutability": "payable",
+    "type": "fallback"
+}, {
+    "inputs": [{
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "internalType": "address",
+        "name": "player1",
+        "type": "address"
+    }, {
+        "internalType": "address",
+        "name": "player2",
+        "type": "address"
+    }, {
+        "internalType": "uint256",
+        "name": "bet",
+        "type": "uint256"
+    }],
+    "name": "createGame",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }, {
+        "internalType": "address",
+        "name": "winner",
+        "type": "address"
+    }],
+    "name": "endGame",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [],
+    "name": "getRoyaltyPercentage",
+    "outputs": [{
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }],
+    "name": "retrieveLockedFunds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }],
+    "name": "stake",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "bytes",
+        "name": "gameCode",
+        "type": "bytes"
+    }],
+    "name": "startGame",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+    }],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "uint256",
+        "name": "_royaltyPercentage",
+        "type": "uint256"
+    }],
+    "name": "updateRoyaltyPercentage",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [],
+    "name": "withdrawRoyaltyFunds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "inputs": [{
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+    }, {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+    }, {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }, {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+    }, {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+    }, {
+        "internalType": "bytes",
+        "name": "_callData",
+        "type": "bytes"
+    }],
+    "name": "xReceive",
+    "outputs": [{
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+    }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "stateMutability": "payable",
+    "type": "receive"
+}]

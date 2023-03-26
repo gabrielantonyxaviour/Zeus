@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { usePolybase, useDocument } from "@polybase/react";
 
+import { useNetwork } from "wagmi";
+
 import PACK_OF_CARDS from "../utils/packOfCards";
 import shuffleArray from "../utils/shuffleArray";
 import io from "socket.io-client";
@@ -22,7 +24,7 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
-import { ABI, CONTRACT_ADDRESS } from "../contract/constants";
+import { ABI_OLD, CONTRACT_ADDRESS_OLD } from "../contract/constants";
 import { ethers } from "ethers";
 //NUMBER CODES FOR ACTION CARDS
 //SKIP - 404
@@ -31,9 +33,11 @@ import { ethers } from "ethers";
 //DRAW 4 WILD - 600
 
 let socket;
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = process.env.REACT_APP_SOCKET_URL || "http://localhost:5000";
 
 const Game = (props) => {
+  const { chain, chains } = useNetwork();
+
   const data = queryString.parse(props.location.search);
 
   // initialize socket states
@@ -53,8 +57,9 @@ const Game = (props) => {
   });
 
   const { config: stakeConfig } = usePrepareContractWrite({
-    address: CONTRACT_ADDRESS,
-    abi: ABI,
+    address: CONTRACT_ADDRESS_OLD,
+    abi: ABI_OLD,
+    chainId: chain.id,
     functionName: "stake",
     args: [room],
     overrides: {
@@ -64,6 +69,7 @@ const Game = (props) => {
       console.log("onSuccess executed LMAO");
     },
   });
+
   const {
     data: stakeReturnData,
     isLoading: stakeReturnDataIsLoading,

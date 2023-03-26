@@ -6,6 +6,7 @@ import "./index.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import App from "./App";
 import { WagmiConfig, createClient, configureChains } from "wagmi";
+import { polygonMumbai, goerli } from "wagmi/chains";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 import {
@@ -35,8 +36,71 @@ const thundercoreChain = {
   testnet: true,
 };
 
+const scrollChain = {
+  id: 534353,
+  name: "Scroll Testnet",
+  network: "scroll-testnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Scroll Alpha Testnet",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: { http: ["https://alpha-rpc.scroll.io/l2"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "explorer-scroll-alpha",
+      url: "https://blockscout.scroll.io/",
+    },
+  },
+  testnet: true,
+};
+
+const taikoChain = {
+  id: 167004,
+  name: "Taiko (Alpha-2 Testnet)",
+  network: "taiko-alpha-2-testnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Taiko (Alpha-2 Testnet)",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: { http: ["https://rpc.a2.taiko.xyz"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "explorer-taiko-alpha-2",
+      url: "https://explorer.a2.taiko.xyz/",
+    },
+  },
+  testnet: true,
+};
+
+const chiado = {
+  id: 10200,
+  name: "Chiado Testnet",
+  network: "chiado-testnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Chiado Testnet",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: { http: ["https://rpc.chiadochain.net/"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "explorer-chiado-alpha-2",
+      url: "https://blockscout.chiadochain.net/",
+    },
+  },
+  testnet: true,
+};
+
 const { chains, provider } = configureChains(
-  [thundercoreChain],
+  [polygonMumbai, goerli, scrollChain, taikoChain, chiado],
   [
     jsonRpcProvider({
       rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }),
@@ -54,6 +118,7 @@ const wagmiClient = createClient({
   connectors,
   provider,
 });
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
