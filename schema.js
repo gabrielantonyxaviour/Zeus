@@ -20,9 +20,17 @@ collection Games {
 
   setStake(address: string){
     if(this.player1_address == address){
-      player1_isStaked = true;
+      this.player1_isStaked = true;
     } else {
-      player2_isStaked = true;
+      this.player2_isStaked = true;
+    }
+  }
+
+  removeStake(address: string){
+     if(this.player1_address == address){
+      this.player1_isStaked = false;
+    } else {
+      this.player2_isStaked = false;
     }
   }
   
@@ -83,6 +91,5 @@ collection Follows {
       selfdestruct();
   }
 } 
-
 
  

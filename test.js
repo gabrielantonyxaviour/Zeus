@@ -7,13 +7,21 @@ const db = new Polybase({
 
 (async () => {
   // .create(args) args array is defined by the constructor fn
-  // const data = await db.collection("Users").where("room", "==", room).get();
+  // const data = await db
+  //   .collection("Games")
+  //   .where("roomCode", "==", "PRgrZxn")
+  //   .get();
   let games = await db.collection("Games").get();
   games = games.data;
 
   for (let i = 0; i < games.length; i++) {
     await db.collection("Games").record(games[i].data.id).call("del", []);
   }
+  const data = await db
+    .collection("Games")
+    .record("4_AT149fG6vHPMBjAAAC")
+    .call("setStake", ["0x67D2B5848a8c9960C5CBEc3d36bFee7637c98797"]);
 
-  //console.log(data.data);
+  console.log(data);
+  // console.log(data.data[0].data);
 })();
