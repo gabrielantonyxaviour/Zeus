@@ -11,10 +11,10 @@ collection Games {
   bet?: number;
   roomCode?: string;
 
-  constructor (id:string, player1_address: string,  bet?: number) {
+  constructor (id:string, player1_address: string, player1_name:string,  bet?: number) {
       this.id = id;
-      this.player1_address = player1_address;
-      this.socketid = socketid; 
+      this.player1_address = player1_address; 
+      this.player1_name = player1_name;
       this.bet = bet;
   }
 
@@ -26,9 +26,10 @@ collection Games {
     }
   }
   
-  setRoomCode (roomCode: string, player2_address:string){
+  setRoomCode (roomCode: string, player2_address:string, player2_name: string){
     this.roomCode = roomCode;
     this.player2_address = player2_address;
+    this.player2_name = player2_name;
   }
 
   setBet (bet: number) {
@@ -84,28 +85,4 @@ collection Follows {
 } 
 
 
-
-// @public
-// collection Users {
-//   id: string;
-//   name: string;
-//   room: string;
-//   address: string;
-//   isStaked: boolean;
-
-//   constructor (id: string, name: string, room: string, address: string, isStaked: boolean) {
-//         this.id = id;
-//         this.name = name;
-//         this.room = room;
-//         this.address = address;
-//         this.isStaked = isStaked;
-//   }
-
-//    setStake (isStaked: boolean) {
-//         this.isStaked = isStaked;
-//     } 
-    
-//   del () { 
-//       selfdestruct();
-//   }
-// } 
+ 
