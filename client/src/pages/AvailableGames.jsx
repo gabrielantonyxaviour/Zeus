@@ -8,7 +8,8 @@ import randomCodeGenerator from "../utils/randomCodeGenerator";
 import { usePolybase } from "@polybase/react";
 
 let socket;
-const ENDPOINT = process.env.REACT_APP_SOCKET_URL || "http://localhost:8080";
+// const ENDPOINT = process.env.REACT_APP_SOCKET_URL || "http://localhost:8080";
+const ENDPOINT = "http://localhost:8080";
 
 const sampleData = [
   {
@@ -173,6 +174,7 @@ const AvailableGames = () => {
                 className="game-button green"
                 onClick={async () => {
                   try {
+                    console.log({ socketid: String(socket.id), address, bet });
                     const response = await polybase
                       .collection("Games")
                       .create([String(socket.id), address, bet]);
@@ -228,7 +230,7 @@ const AvailableGames = () => {
                     onClick={() => {
                       socket.emit("offer", {
                         accepterSocketId: socket.id,
-                        creatorSocketId: val.data.socketid,
+                        creatorSocketId: val.data.id,
                         name: val.data.profile.name,
                         bet: val.data.bet,
                       });
