@@ -5,7 +5,7 @@ import GameOfferPopUpModel from "../components/GameOfferPopUpModel";
 import io from "socket.io-client";
 import NormalPopup from "../components/NormalPopup";
 import randomCodeGenerator from "../utils/randomCodeGenerator";
-import { usePolybase, useDocument } from "@polybase/react";
+import { usePolybase } from "@polybase/react";
 
 let socket;
 const ENDPOINT = process.env.REACT_APP_SOCKET_URL || "http://localhost:8080";
@@ -70,7 +70,6 @@ const AvailableGames = () => {
   const [showModel, setShowModel] = useState(false);
   const [showAcknowledge, setShowAcknowledge] = useState(false);
   const [games, setGames] = useState([]);
-  const [profile, setProfile] = useState({});
   const [offerName, setOfferName] = useState("");
   const [offerPrice, setOfferPrice] = useState(0);
   const [offerSocketId, setOfferSocketId] = useState("");
@@ -83,22 +82,8 @@ const AvailableGames = () => {
   useEffect(() => {
     (async function () {
       try {
-        const profile_data = await polybase
-          .collection("Profiles")
-          .record(address)
-          .get();
-        setProfile(profile_data.data);
-
         const games_data = await polybase.collection("Games").get();
-
-        for (let i = 0; i < games_data.data.length; i++) {
-          const profile_data = await polybase
-            .collection("Profiles")
-            .record(games_data.data[i].data.profile)
-            .get();
-          games_data.data[i].data.profile = profile_data.data;
-        }
-
+        console.log("games_data", games_data);
         setGames(games_data.data);
       } catch (err) {
         console.error(err.message);
@@ -148,7 +133,7 @@ const AvailableGames = () => {
         const newGameResponse = await polybase
           .collection("Games")
           .record(String(senderSocketId))
-          .call("setRoomCode", [roomCode]);
+          .call("setRoomCode", [roomCode, address]);
         console.log("Setting Room Code for", newGameResponse);
       } catch (err) {
         console.error(err.message);
@@ -190,7 +175,7 @@ const AvailableGames = () => {
                   try {
                     const response = await polybase
                       .collection("Games")
-                      .create([address, String(socket.id), bet]);
+                      .create([String(socket.id), address, bet]);
                     console.log("New Game Response: ", response);
 
                     if (response) {
@@ -270,7 +255,7 @@ const AvailableGames = () => {
             bet,
             senderSocketId: socket.id,
           });
-          window.location = `/play?roomCode=${roomCode}`;
+          window.location = `/stake?roomCode=${roomCode}`;
           setShowModel(false);
         }}
         onReject={() => {

@@ -1,22 +1,34 @@
-let schema = ` 
 
 @public
 collection Games {
   id: string;
-  profile: string;
-  socketid: string;
+  player1_address?: string;
+  player2_address?: string;
+  player1_name?: string;
+  player2_name?: string;
+  player1_isStaked?: boolean;
+  player2_isStaked?: boolean; 
   bet?: number;
   roomCode?: string;
 
-  constructor (  profile: string, socketid: string, bet?: number) {
-      this.id = socketid;
-      this.profile = profile;
+  constructor (id:string, player1_address: string,  bet?: number) {
+      this.id = id;
+      this.player1_address = player1_address;
       this.socketid = socketid; 
       this.bet = bet;
   }
 
-  setRoomCode (roomCode: string){
+  setStake(address: string){
+    if(this.player1_address == address){
+      player1_isStaked = true;
+    } else {
+      player2_isStaked = true;
+    }
+  }
+  
+  setRoomCode (roomCode: string, player2_address:string){
     this.roomCode = roomCode;
+    this.player2_address = player2_address;
   }
 
   setBet (bet: number) {
@@ -44,15 +56,12 @@ collection Profiles {
       this.description = description;
   }
 
-  updateProfle (name: string, description: string) {
+  updateProfile (name: string, description: string) {
     this.name = name;
     this.description = description;
   }
 
-  del () {
-      if (owner != ctx.auth) {
-          throw error();
-      }
+  del () { 
       selfdestruct();
   }
 }
@@ -69,38 +78,34 @@ collection Follows {
       this.follower_wallet_address = follower_wallet_address;
   }
 
-  del () {
-      if (owner != ctx.auth) {
-          throw error();
-      }
-      selfdestruct();
-  }
-} 
-
-
-
-@public
-collection Users {
-  id: string;
-  name: string;
-  room: string;
-  address: string;
-  isStaked: boolean;
-
-  constructor (id: string, name: string, room: string, address: string, isStaked: boolean) {
-        this.id = id;
-        this.name = name;
-        this.room = room;
-        this.address = address;
-        this.isStaked = isStaked;
-  }
-
-   setStake (isStaked: boolean) {
-        this.isStaked = isStaked;
-    } 
-    
   del () { 
       selfdestruct();
   }
 } 
-`;
+
+
+
+// @public
+// collection Users {
+//   id: string;
+//   name: string;
+//   room: string;
+//   address: string;
+//   isStaked: boolean;
+
+//   constructor (id: string, name: string, room: string, address: string, isStaked: boolean) {
+//         this.id = id;
+//         this.name = name;
+//         this.room = room;
+//         this.address = address;
+//         this.isStaked = isStaked;
+//   }
+
+//    setStake (isStaked: boolean) {
+//         this.isStaked = isStaked;
+//     } 
+    
+//   del () { 
+//       selfdestruct();
+//   }
+// } 

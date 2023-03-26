@@ -1,24 +1,44 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import queryString from "query-string";
 import { usePolybase } from "@polybase/react";
+import { useAccount } from "wagmi";
 
 const Staking = (props) => {
-  const data = queryString.parse(props.location.search);
-
-  const { roomCode } = data;
   const polybase = usePolybase();
+  const { address } = useAccount();
+
+  const data = queryString.parse(props.location.search);
+  const { roomCode } = data;
+
+  const [gameData, setGameData] = useState(null);
+  const [gameNotFound, setGameNotFound] = useState(true);
 
   useEffect(() => {
     console.log(data);
     (async function () {
       // Fetch game record
       try {
-        const gameRecord = await polybase
+        const games = await polybase
           .collection("Games")
           .where("roomCode", "==", roomCode)
           .get();
 
-        console.log(gameRecord.data);
+        if (games.data.length === 0) {
+          setGameNotFound(true);
+        } else {
+          setGameNotFound(false);
+          let gameRecord = games.data[0];
+          setGameData(gameRecord);
+
+          if (gameRecord.player1 === address) {
+            console.log("You are player one");
+          } else if (gameRecord.player2 === address) {
+            console.log("You are player two");
+          } else {
+            console.log("You are not a player");
+            window.location.href = "/games";
+          }
+        }
       } catch (err) {
         console.error(err);
       }
