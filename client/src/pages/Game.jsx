@@ -49,7 +49,6 @@ const Game = (props) => {
   const [messages, setMessages] = useState([]);
   const [gameData, setGameData] = useState({});
 
-  const [ready, setReady] = useState(false);
   useEffect(() => {
     const connectionOptions = {
       forceNew: true,
@@ -58,7 +57,6 @@ const Game = (props) => {
       transports: ["websocket"],
     };
     socket = io.connect(ENDPOINT, connectionOptions);
-    setReady(true);
 
     socket.emit("join", { room: room, address: address }, (error) => {
       if (error !== "Already in" && error != undefined) {
@@ -94,30 +92,46 @@ const Game = (props) => {
 
   useEffect(() => {
     (async () => {
-      console.log("Creating provider...");
-      const provider = new ethers.providers.JsonRpcProvider(
-        apiUrls[chain.id],
-        chain.id
-      );
-      console.log("Creating signer...");
-      const signer = new ethers.Wallet(
-        process.env.REACT_APP_PRIVATE_KEY,
-        provider
-      );
-      console.log("Creating contract...");
-      const OxReceiverUNO = new ethers.Contract(
-        contractAddress[chain.id],
-        OxReceiverUNO_ABI,
-        signer
-      );
       console.log("Ending Game...");
 
       if (winner == "Player 1") {
+        console.log("Creating provider...");
+        const provider = new ethers.providers.JsonRpcProvider(
+          apiUrls[chain.id],
+          chain.id
+        );
+        console.log("Creating signer...");
+        const signer = new ethers.Wallet(
+          process.env.REACT_APP_PRIVATE_KEY,
+          provider
+        );
+        console.log("Creating contract...");
+        const OxReceiverUNO = new ethers.Contract(
+          contractAddress[chain.id],
+          OxReceiverUNO_ABI,
+          signer
+        );
         await OxReceiverUNO.endGame(
           room,
           users.find((user) => user.name === "Player 1").address
         );
       } else if (winner == "Player 2") {
+        console.log("Creating provider...");
+        const provider = new ethers.providers.JsonRpcProvider(
+          apiUrls[chain.id],
+          chain.id
+        );
+        console.log("Creating signer...");
+        const signer = new ethers.Wallet(
+          process.env.REACT_APP_PRIVATE_KEY,
+          provider
+        );
+        console.log("Creating contract...");
+        const OxReceiverUNO = new ethers.Contract(
+          contractAddress[chain.id],
+          OxReceiverUNO_ABI,
+          signer
+        );
         await OxReceiverUNO.endGame(
           room,
           users.find((user) => user.name === "Player 2").address
@@ -167,89 +181,85 @@ const Game = (props) => {
     const drawCardPile = shuffledCards;
 
     //send initial state to server
-    if (ready) {
-      socket.emit("initGameState", {
-        gameOver: false,
-        turn: "Player 1",
-        player1Deck: [...player1Deck],
-        player2Deck: [...player2Deck],
-        currentColor: playedCardsPile[0].charAt(1),
-        currentNumber: playedCardsPile[0].charAt(0),
-        playedCardsPile: [...playedCardsPile],
-        drawCardPile: [...drawCardPile],
-      });
-    }
+    socket.emit("initGameState", {
+      gameOver: false,
+      turn: "Player 1",
+      player1Deck: [...player1Deck],
+      player2Deck: [...player2Deck],
+      currentColor: playedCardsPile[0].charAt(1),
+      currentNumber: playedCardsPile[0].charAt(0),
+      playedCardsPile: [...playedCardsPile],
+      drawCardPile: [...drawCardPile],
+    });
   }, []);
 
   useEffect(() => {
-    if (ready) {
-      socket.on(
-        "initGameState",
-        ({
-          gameOver,
-          turn,
-          player1Deck,
-          player2Deck,
-          currentColor,
-          currentNumber,
-          playedCardsPile,
-          drawCardPile,
-        }) => {
-          setGameOver(gameOver);
-          setTurn(turn);
-          setPlayer1Deck(player1Deck);
-          setPlayer2Deck(player2Deck);
-          setCurrentColor(currentColor);
-          setCurrentNumber(currentNumber);
-          setPlayedCardsPile(playedCardsPile);
-          setDrawCardPile(drawCardPile);
-        }
-      );
+    socket.on(
+      "initGameState",
+      ({
+        gameOver,
+        turn,
+        player1Deck,
+        player2Deck,
+        currentColor,
+        currentNumber,
+        playedCardsPile,
+        drawCardPile,
+      }) => {
+        setGameOver(gameOver);
+        setTurn(turn);
+        setPlayer1Deck(player1Deck);
+        setPlayer2Deck(player2Deck);
+        setCurrentColor(currentColor);
+        setCurrentNumber(currentNumber);
+        setPlayedCardsPile(playedCardsPile);
+        setDrawCardPile(drawCardPile);
+      }
+    );
 
-      socket.on(
-        "updateGameState",
-        ({
-          gameOver,
-          winner,
-          turn,
-          player1Deck,
-          player2Deck,
-          currentColor,
-          currentNumber,
-          playedCardsPile,
-          drawCardPile,
-        }) => {
-          gameOver && setGameOver(gameOver);
-          gameOver === true && playGameOverSound();
-          winner && setWinner(winner);
-          turn && setTurn(turn);
-          player1Deck && setPlayer1Deck(player1Deck);
-          player2Deck && setPlayer2Deck(player2Deck);
-          currentColor && setCurrentColor(currentColor);
-          currentNumber && setCurrentNumber(currentNumber);
-          playedCardsPile && setPlayedCardsPile(playedCardsPile);
-          drawCardPile && setDrawCardPile(drawCardPile);
-          setUnoButtonPressed(false);
-        }
-      );
+    socket.on(
+      "updateGameState",
+      ({
+        gameOver,
+        winner,
+        turn,
+        player1Deck,
+        player2Deck,
+        currentColor,
+        currentNumber,
+        playedCardsPile,
+        drawCardPile,
+      }) => {
+        gameOver && setGameOver(gameOver);
+        gameOver === true && playGameOverSound();
+        winner && setWinner(winner);
+        turn && setTurn(turn);
+        player1Deck && setPlayer1Deck(player1Deck);
+        player2Deck && setPlayer2Deck(player2Deck);
+        currentColor && setCurrentColor(currentColor);
+        currentNumber && setCurrentNumber(currentNumber);
+        playedCardsPile && setPlayedCardsPile(playedCardsPile);
+        drawCardPile && setDrawCardPile(drawCardPile);
+        setUnoButtonPressed(false);
+      }
+    );
 
-      socket.on("roomData", ({ users }) => {
-        console.log("received Roomdata");
-        setUsers(users);
-      });
+    socket.on("roomData", ({ users }) => {
+      console.log("received Roomdata");
+      setUsers(users);
+    });
 
-      socket.on("currentUserData", ({ name }) => {
-        console.log("received Current UserData");
-        setCurrentUser(name);
-      });
+    socket.on("currentUserData", ({ name }) => {
+      console.log("received Current UserData");
+      setCurrentUser(name);
+    });
 
-      socket.on("message", (message) => {
-        setMessages((messages) => [...messages, message]);
+    socket.on("message", (message) => {
+      setMessages((messages) => [...messages, message]);
 
-        const chatBody = document.querySelector(".chat-body");
-        chatBody.scrollTop = chatBody.scrollHeight;
-      });
-    }
+      const chatBody = document.querySelector(".chat-body");
+      chatBody.scrollTop = chatBody.scrollHeight;
+    });
   }, []);
 
   //some util functions
