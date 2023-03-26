@@ -17,6 +17,7 @@ const {
   getUsersInRoom,
   stakeUser,
   isEveryoneStaked,
+  getUserWithAddress,
 } = require("./helpers/users");
 const { addGame, getGame } = require("./helpers/games");
 
@@ -24,17 +25,17 @@ io.on("connection", (socket) => {
   console.log("Client connected at ID: " + socket.id);
 
   socket.on("join", async (payload, callback) => {
-    if (getUser(socket.id) != undefined) {
+    let numberOfUsersInRoom = getUsersInRoom(payload.room).length;
+    if (getUserWithAddress(payload.address) != undefined) {
       return callback("Already in ");
     }
 
     const { error, newUser } = await addUser({
       id: socket.id,
-      // name: numberOfUsersInRoom === 0 ? "Player 1" : "Player 2",
-      name: payload.name,
+      name: numberOfUsersInRoom === 0 ? "Player 1" : "Player 2",
       address: payload.address,
       room: payload.room,
-      bet: getGame(payload.room).bet,
+      bet: payload.bet,
       isStaked: false,
     });
     console.log(newUser);
@@ -44,7 +45,7 @@ io.on("connection", (socket) => {
 
     io.to(newUser.room).emit("roomData", {
       room: newUser.room,
-      bet: getGame(payload.room).bet,
+      bet: payload.bet,
       users: getUsersInRoom(newUser.room),
     });
     socket.emit("currentUserData", { name: newUser.name });

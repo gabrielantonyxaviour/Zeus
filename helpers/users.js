@@ -31,6 +31,10 @@ const getUser = (id) => {
   return users.find((user) => user.id === id);
 };
 
+const getUserWithAddress = (address) => {
+  return users.find((user) => user.address === address);
+};
+
 const getUsersInRoom = (room) => {
   return users.filter((user) => user.room === room);
 };
@@ -39,6 +43,7 @@ module.exports = {
   addUser,
   removeUser,
   getUser,
+  getUserWithAddress,
   getUsersInRoom,
   stakeUser,
   isEveryoneStaked,

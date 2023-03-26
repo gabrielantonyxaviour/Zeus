@@ -6,6 +6,7 @@ import {
   contractAddress,
   OxReceiverUNO_ABI,
   OxSenderUNO_ABI,
+  tokenName,
 } from "../contract/constants";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { ethers } from "ethers";
@@ -29,14 +30,20 @@ const Staking = (props) => {
     args:
       chain.id == 5
         ? [
-            roomCode,
+            ethers.utils.hexlify(ethers.utils.toUtf8Bytes(roomCode)),
             ethers.utils.parseEther("0.0001"),
             9991,
             ethers.utils.parseEther("0.0001"),
           ]
-        : [roomCode],
+        : [ethers.utils.hexlify(ethers.utils.toUtf8Bytes(roomCode))],
     overrides: {
       value: ethers.utils.parseEther("0.0001"),
+    },
+    onSuccess(data) {
+      console.log("Success");
+    },
+    onError(error) {
+      console.log("Error", error);
     },
   });
   const {
@@ -46,7 +53,7 @@ const Staking = (props) => {
     write: stake,
   } = useContractWrite(stakeConfig);
   useEffect(() => {
-    console.log(data);
+    console.log(ethers.utils.hexlify(ethers.utils.toUtf8Bytes(roomCode)));
     (async function () {
       // Fetch game record
       try {
@@ -80,28 +87,42 @@ const Staking = (props) => {
   }, []);
 
   useEffect(() => {
-    // TODO
     if (stakeReturnDataIsSuccess) {
       (async function () {
         const updatedGame = await polybase
           .collection("Games")
-          .record(gameData.id)
+          .record(gameData?.id)
           .call("setStake", [address]);
 
         console.log(updatedGame);
+
+        setGameData(updatedGame.data);
       })();
     }
   }, [stakeReturnDataIsSuccess]);
-
   useEffect(() => {
-    (async function () {
-      await polybase
+    if (
+      gameData?.player1_isStaked === true &&
+      gameData?.player2_isStaked === true
+    ) {
+      window.location = `/play?roomCode=${roomCode}`;
+    }
+  }, [gameData]);
+  useEffect(() => {
+    (function () {
+      polybase
         .collection("Games")
-        .record(gameData.id)
+        .record(gameData?.id)
         .onSnapshot(
           (newDoc) => {
             // Handle the change
             console.log(newDoc);
+            if (
+              newDoc.player1_isStaked === true &&
+              newDoc.player2_isStaked === true
+            ) {
+              window.location = `/play?roomCode=${roomCode}`;
+            }
             // setGameData({ ...gameData, newDoc });
           },
           (err) => {
@@ -114,34 +135,73 @@ const Staking = (props) => {
   return (
     <div className="Homepage select-none">
       <div className="homepage-menu max-w-[1240px] mx-auto w-full text-center ">
-        <div className="flex justify-between mb-10">
-          <button className="w-[100px]"></button>
-          <p className="text-3xl">Staking</p>
-          <div className="game-button blue" style={{ cursor: "default" }}>
-            {" Balance 💵 " + balance.formatted + " TST"}
-          </div>
-        </div>
-        <div className="flex justify-between w-[60%] mx-auto">
-          <p className="text-white my-auto">{gameData.player1_name}</p>
-          {stakeReturnDataIsSuccess && gameData.player1_address == address ? (
-            <button className="game-button green" style={{ cursor: "default" }}>
-              Staked ✅
-            </button>
-          ) : gameData.player2_address == address ? (
-            <button
-              className="game-button orange"
-              onClick={() => {
-                stake();
-              }}
-            >
-              Stake 💵
-            </button>
-          ) : (
-            <button className="game-button red" style={{ cursor: "default" }}>
-              Waiting to Stake
-            </button>
-          )}
-        </div>
+        {gameData != null ? (
+          <>
+            <div className="flex justify-between mb-10">
+              <button className="w-[100px]"></button>
+              <p className="text-3xl">Staking</p>
+              <div className="game-button blue" style={{ cursor: "default" }}>
+                {" Balance 💵 " + balance.formatted + " " + tokenName[chain.id]}
+              </div>
+            </div>
+            <div className="flex justify-between w-[60%] mx-auto">
+              <p className="text-white my-auto">{gameData.player1_name}</p>
+              {gameData?.player1_isStaked == true ? (
+                <button
+                  className="game-button green"
+                  style={{ cursor: "default" }}
+                >
+                  Staked ✅
+                </button>
+              ) : gameData.player1_address == address ? (
+                <button
+                  className="game-button orange"
+                  onClick={() => {
+                    stake();
+                  }}
+                >
+                  Stake 💵
+                </button>
+              ) : (
+                <button
+                  className="game-button red"
+                  style={{ cursor: "default" }}
+                >
+                  Waiting to Stake
+                </button>
+              )}
+            </div>
+            <div className="flex justify-between w-[60%] mx-auto">
+              <p className="text-white my-auto">{gameData.player2_name}</p>
+              {gameData?.player2_isStaked == true ? (
+                <button
+                  className="game-button green"
+                  style={{ cursor: "default" }}
+                >
+                  Staked ✅
+                </button>
+              ) : gameData.player2_address == address ? (
+                <button
+                  className="game-button orange"
+                  onClick={() => {
+                    stake();
+                  }}
+                >
+                  Stake 💵
+                </button>
+              ) : (
+                <button
+                  className="game-button red"
+                  style={{ cursor: "default" }}
+                >
+                  Waiting to Stake
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          <p>Loading...</p>
+        )}
       </div>
     </div>
   );

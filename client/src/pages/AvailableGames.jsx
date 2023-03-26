@@ -1,11 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useNetwork } from "wagmi";
 import GameOfferPopUpModel from "../components/GameOfferPopUpModel";
 import io from "socket.io-client";
 import NormalPopup from "../components/NormalPopup";
 import randomCodeGenerator from "../utils/randomCodeGenerator";
 import { usePolybase } from "@polybase/react";
+import {
+  apiUrls,
+  contractAddress,
+  OxReceiverUNO_ABI,
+  tokenName,
+} from "../contract/constants";
+import { ethers } from "ethers";
 
 let socket;
 // const ENDPOINT = process.env.REACT_APP_SOCKET_URL || "http://localhost:8080";
@@ -80,6 +87,7 @@ const AvailableGames = () => {
   const { data: balance, isFetched } = useBalance({
     address,
   });
+  const { chain } = useNetwork();
 
   useEffect(() => {
     (async function () {
@@ -149,11 +157,45 @@ const AvailableGames = () => {
             address,
             profile?.name || "Annonyms",
           ]);
+
+        console.log("Creating provider...");
+        const provider = new ethers.providers.JsonRpcProvider(
+          apiUrls[chain.id],
+          chain.id
+        );
+        console.log("Creating signer...");
+        const signer = new ethers.Wallet(
+          process.env.REACT_APP_PRIVATE_KEY,
+          provider
+        );
+        console.log("Creating contract...");
+        const OxReceiverUNO = new ethers.Contract(
+          contractAddress[chain.id],
+          OxReceiverUNO_ABI,
+          signer
+        );
+        console.log("Creating Game...");
+        let gameInfo = await polybase
+          .collection("Games")
+          .where("roomCode", "==", roomCode)
+          .get();
+        gameInfo = gameInfo.data[0].data;
+
+        console.log(gameInfo);
+
+        await OxReceiverUNO.createGame(
+          ethers.utils.hexlify(ethers.utils.toUtf8Bytes(roomCode)),
+          gameInfo.player1_address,
+          gameInfo.player2_address,
+          bet
+        );
       } catch (err) {
         console.error(err.message);
       }
+      console.log("Successfully Created Game");
       window.location = `/stake?roomCode=${roomCode}`;
     });
+    console.log("Succesfully staked");
   }, []);
 
   return (
@@ -177,11 +219,11 @@ const AvailableGames = () => {
                 style={{ accentColor: "yellow" }}
                 onChange={(e) => {
                   console.log(socket.id);
-                  setBet(e.target.value);
+                  setBet(Number(e.target.value));
                 }}
               />
               <p className=" mx-3 text-lg" style={{ display: "inline" }}>
-                {bet} TST
+                {` ${bet} ${tokenName[chain.id]}`}
               </p>
               <button
                 className="game-button green"
@@ -254,7 +296,7 @@ const AvailableGames = () => {
                         bet: val.data.bet,
                       });
                     }}
-                  >{`Stake 💸 ${val.data.bet} TST `}</button>
+                  >{`Stake 💸 ${val.data.bet} ${tokenName[chain.id]} `}</button>
                 </div>
               </div>
             );
@@ -286,7 +328,7 @@ const AvailableGames = () => {
       />
       <NormalPopup
         title={"Game Offer created!"}
-        description={bet + " TST game is offered."}
+        description={bet + ` ${tokenName[chain.id]} game is offered.`}
         onClose={() => {
           setShowAcknowledge(false);
         }}

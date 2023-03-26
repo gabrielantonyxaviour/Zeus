@@ -884,7 +884,7 @@ const OxSenderUNO_ABI = [
 
 const CONTRACT_ADDRESS_OLD = "0x8d4d773dF48cd3f827B5F1d3269bd5B057012631";
 
-const MUMBAI_CONTRACT_ADDRESS = "0x358e3791c19365904116610E668fF846b4EF4cfF";
+const MUMBAI_CONTRACT_ADDRESS = "0x31a70eb8990ccc7fdb4f96a62f5c1aa6e314c88b";
 const CHIADO_CONTRACT_ADDRESS = "0x16CBC6Cb38D19B73A3b545109c70b2031d20EA37";
 const TAIKO_CONTRACT_ADDRESS = "0x16CBC6Cb38D19B73A3b545109c70b2031d20EA37";
 const SCROLL_CONTRACT_ADDRESS = "0xC044FCe37927A0Cb55C7e57425Fe3772181228a6";
@@ -897,6 +897,20 @@ const contractAddress = {
   167004: TAIKO_CONTRACT_ADDRESS,
   10200: CHIADO_CONTRACT_ADDRESS,
 };
+const apiUrls = {
+  5: "https://rpc.ankr.com/eth_goerli",
+  80001: "https://rpc.ankr.com/polygon_mumbai",
+  534353: "https://alpha-rpc.scroll.io/l2",
+  167004: "https://rpc.a2.taiko.xyz",
+  10200: "https://rpc.chiadochain.net",
+};
+const tokenName = {
+  5: "ETH",
+  80001: "MATIC",
+  534353: "ETH",
+  167004: "ETH",
+  10200: "xDAI",
+};
 export {
   ABI_OLD,
   CONTRACT_ADDRESS_OLD,
@@ -905,4 +919,6 @@ export {
   OxSenderUNO_ABI,
   //
   contractAddress,
+  tokenName,
+  apiUrls,
 };

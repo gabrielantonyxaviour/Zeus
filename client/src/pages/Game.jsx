@@ -17,6 +17,7 @@ import draw4CardSound from "../assets/sounds/draw4-sound.mp3";
 import gameOverSound from "../assets/sounds/game-over-sound.mp3";
 
 import { usePrepareContractWrite } from "wagmi";
+import { usePolybase } from "@polybase/react";
 //NUMBER CODES FOR ACTION CARDS
 //SKIP - 404
 //DRAW 2 - 252
@@ -24,12 +25,13 @@ import { usePrepareContractWrite } from "wagmi";
 //DRAW 4 WILD - 600
 
 let socket;
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = "http://localhost:8080";
 // const ENDPOINT = "https://uno-online-multiplayer.herokuapp.com/";
 
 const Game = (props) => {
   const data = queryString.parse(props.location.search);
   const { address } = useAccount();
+  const polybase = usePolybase();
 
   //initialize socket state
   const [room, setRoom] = useState(data.roomCode);
@@ -39,47 +41,43 @@ const Game = (props) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [gameData, setGameData] = useState({});
-
   useEffect(() => {
     (async function () {
-      // Fetch game record
-      try {
-        const games = await polybase
-          .collection("Games")
-          .where("roomCode", "==", room)
-          .get();
+      let _gameData;
+      const games = await polybase
+        .collection("Games")
+        .where("roomCode", "==", room)
+        .get();
+      _gameData = games.data[0].data;
+      // if (
+      //   _gameData.player1_address != address &&
+      //   _gameData.player2_address != address
+      // ) {
+      //   console.log("You are not a player");
+      //   window.location.href = "/games";
+      // }
+      const connectionOptions = {
+        forceNew: true,
+        reconnectionAttempts: "Infinity",
+        timeout: 10000,
+        transports: ["websocket"],
+      };
+      socket = io.connect(ENDPOINT, connectionOptions);
 
-        if (games.data.length === 0) {
-          setGameNotFound(true);
-        } else {
-          setGameNotFound(false);
-          let gameRecord = games.data[0];
-          setGameData(gameRecord);
-
-          if (
-            gameRecord.player1_staked != true ||
-            gameRecord.player2_staked != true
-          ) {
-            console.log("Players not staked yet");
-          } else if (gameRecord.player1_address === address) {
-            console.log("You are player one");
-          } else if (gameRecord.player2_address === address) {
-            console.log("You are player two");
-          } else {
-            console.log("You are not a player");
-            window.location.href = "/games";
-          }
+      socket.emit(
+        "join",
+        { room: room, address: address, bet: _gameData.bet },
+        (error) => {
+          if (error) setRoomFull(true);
         }
-      } catch (err) {
-        console.error(err);
-      }
+      );
     })();
 
     //cleanup on component unmount
     return function cleanup() {
-      socket.disconnect();
+      socket?.disconnect();
       //shut down connnection instance
-      socket.off();
+      socket?.off();
     };
   }, []);
 
@@ -150,7 +148,7 @@ const Game = (props) => {
     const drawCardPile = shuffledCards;
 
     //send initial state to server
-    socket.emit("initGameState", {
+    socket?.emit("initGameState", {
       gameOver: false,
       turn: "Player 1",
       player1Deck: [...player1Deck],
@@ -163,7 +161,7 @@ const Game = (props) => {
   }, []);
 
   useEffect(() => {
-    socket.on(
+    socket?.on(
       "initGameState",
       ({
         gameOver,
@@ -186,7 +184,7 @@ const Game = (props) => {
       }
     );
 
-    socket.on(
+    socket?.on(
       "updateGameState",
       ({
         gameOver,
@@ -213,15 +211,15 @@ const Game = (props) => {
       }
     );
 
-    socket.on("roomData", ({ users }) => {
+    socket?.on("roomData", ({ users }) => {
       setUsers(users);
     });
 
-    socket.on("currentUserData", ({ name }) => {
+    socket?.on("currentUserData", ({ name }) => {
       setCurrentUser(name);
     });
 
-    socket.on("message", (message) => {
+    socket?.on("message", (message) => {
       setMessages((messages) => [...messages, message]);
 
       const chatBody = document.querySelector(".chat-body");
