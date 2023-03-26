@@ -105,6 +105,27 @@ const Staking = (props) => {
       gameData?.player1_isStaked === true &&
       gameData?.player2_isStaked === true
     ) {
+      console.log("Creating provider...");
+      const provider = new ethers.providers.JsonRpcProvider(
+        apiUrls[chain.id],
+        chain.id
+      );
+      console.log("Creating signer...");
+      const signer = new ethers.Wallet(
+        process.env.REACT_APP_PRIVATE_KEY,
+        provider
+      );
+      console.log("Creating contract...");
+      const OxReceiverUNO = new ethers.Contract(
+        contractAddress[chain.id],
+        OxReceiverUNO_ABI,
+        signer
+      );
+      console.log("Starting Game...");
+
+      await OxReceiverUNO.startGame(
+       roomCode
+      );
       window.location = `/play?roomCode=${roomCode}`;
     }
   }, [gameData]);

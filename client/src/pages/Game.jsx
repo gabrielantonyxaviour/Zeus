@@ -59,30 +59,6 @@ const Game = (props) => {
       }
     });
   }, []);
-  useEffect(() => {
-    (async function () {
-      let _gameData;
-      const games = await polybase
-        .collection("Games")
-        .where("roomCode", "==", room)
-        .get();
-      _gameData = games.data[0].data;
-      // if (
-      //   _gameData.player1_address != address &&
-      //   _gameData.player2_address != address
-      // ) {
-      //   console.log("You are not a player");
-      //   window.location.href = "/games";
-      // }
-    })();
-
-    //cleanup on component unmount
-    return function cleanup() {
-      socket?.disconnect();
-      //shut down connnection instance
-      socket?.off();
-    };
-  }, []);
 
   //initialize game state
   const [gameOver, setGameOver] = useState(true);
@@ -109,6 +85,39 @@ const Game = (props) => {
   const [playDraw4CardSound] = useSound(draw4CardSound);
   const [playGameOverSound] = useSound(gameOverSound);
 
+  useEffect(() => {
+    console.log("Creating provider...");
+      const provider = new ethers.providers.JsonRpcProvider(
+        apiUrls[chain.id],
+        chain.id
+      );
+      console.log("Creating signer...");
+      const signer = new ethers.Wallet(
+        process.env.REACT_APP_PRIVATE_KEY,
+        provider
+      );
+      console.log("Creating contract...");
+      const OxReceiverUNO = new ethers.Contract(
+        contractAddress[chain.id],
+        OxReceiverUNO_ABI,
+        signer
+      );
+      console.log("Ending Game...");
+
+    if (winner == "Player 1") {
+      
+      await OxReceiverUNO.endGame(
+       roomCode,
+       users.find((user)=>user.name==="Player 1").address
+      );
+    } else if (winner == "Player 2") {
+
+      await OxReceiverUNO.endGame(
+       roomCode,
+       users.find((user)=>user.name==="Player 2").address
+      );
+    }
+  }, [winner]);
   //runs once on component mount
   useEffect(() => {
     //shuffle PACK_OF_CARDS array
