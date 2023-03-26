@@ -17,10 +17,10 @@ const db = new Polybase({
   for (let i = 0; i < games.length; i++) {
     await db.collection("Games").record(games[i].data.id).call("del", []);
   }
-  const data = await db
-    .collection("Games")
-    .record("4_AT149fG6vHPMBjAAAC")
-    .call("setStake", ["0x67D2B5848a8c9960C5CBEc3d36bFee7637c98797"]);
+  // const data = await db
+  //   .collection("Games")
+  //   .record("4_AT149fG6vHPMBjAAAC")
+  //   .call("setStake", ["0x67D2B5848a8c9960C5CBEc3d36bFee7637c98797"]);
 
   console.log(data);
   // console.log(data.data[0].data);

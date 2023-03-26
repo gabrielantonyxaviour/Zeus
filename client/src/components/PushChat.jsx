@@ -9,8 +9,23 @@ export const PushChat = ({ recipient_address }) => {
   const { data: signer, isError, isLoading } = useSigner();
   const [loading, setLoading] = React.useState(true);
   const [recipient, setRecipient] = React.useState(null);
+
+  const [message, setMessage] = React.useState("");
   const [chats, setChats] = React.useState([]);
   const [pgpDecryptedPvtKey, setPgpDecryptedPvtKey] = React.useState(null);
+
+  async function sendMessage(message) {
+    if (recipient && pgpDecryptedPvtKey) {
+      // actual api
+      const response = await PushAPI.chat.send({
+        messageContent: message,
+        messageType: "Text", // can be "Text" | "Image" | "File" | "GIF"
+        receiverAddress: `eip155:${recipient_address}`,
+        signer: signer,
+        pgpPrivateKey: pgpDecryptedPvtKey,
+      });
+    }
+  }
 
   React.useEffect(() => {
     if (!isLoading) {
@@ -58,5 +73,26 @@ export const PushChat = ({ recipient_address }) => {
     }
   }, [isLoading, signer, pgpDecryptedPvtKey]);
 
-  return !loading ? <h1>{JSON.stringify(chats)}</h1> : <h1>Loading...</h1>;
+  return !loading ? (
+    <div>
+      <div className="row">
+        {chats.map((chat, index) => (
+          <div key={index}>
+            <p>{JSON.stringify(chat)}</p>
+          </div>
+        ))}
+      </div>
+      <div className="flex">
+        <input
+          type="text"
+          id="message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <button onClick={() => sendMessage(message)}>Send</button>
+      </div>
+    </div>
+  ) : (
+    <h1>Loading...</h1>
+  );
 };
