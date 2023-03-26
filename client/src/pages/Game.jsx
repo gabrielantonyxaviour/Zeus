@@ -1751,7 +1751,7 @@ const Game = (props) => {
       {!roomFull ? (
         <>
           <div className="topInfo">
-            <img src={require("../assets/logo.png").default} />
+            <img src={"assets/logo.png"} />
             <h1>Game Code: {room}</h1>
             <span>
               <button
@@ -1817,7 +1817,7 @@ const Game = (props) => {
                             key={i}
                             className="Card"
                             onClick={() => onCardPlayedHandler(item)}
-                            src={require(`../assets/card-back.png`).default}
+                            src={"assets/card-back.png"}
                           />
                         ))}
                         {turn === "Player 2" && <Spinner />}
@@ -1839,11 +1839,9 @@ const Game = (props) => {
                         {playedCardsPile && playedCardsPile.length > 0 && (
                           <img
                             className="Card"
-                            src={
-                              require(`../assets/cards-front/${
-                                playedCardsPile[playedCardsPile.length - 1]
-                              }.png`).default
-                            }
+                            src={`assets/cards-front/${
+                              playedCardsPile[playedCardsPile.length - 1]
+                            }.png`}
                           />
                         )}
                         <button
@@ -1870,10 +1868,7 @@ const Game = (props) => {
                             key={i}
                             className="Card"
                             onClick={() => onCardPlayedHandler(item)}
-                            src={
-                              require(`../assets/cards-front/${item}.png`)
-                                .default
-                            }
+                            src={`assets/cards-front/${item}.png`}
                           />
                         ))}
                       </div>
@@ -1944,7 +1939,7 @@ const Game = (props) => {
                             key={i}
                             className="Card"
                             onClick={() => onCardPlayedHandler(item)}
-                            src={require(`../assets/card-back.png`).default}
+                            src={`assets/card-back.png`}
                           />
                         ))}
                         {turn === "Player 1" && <Spinner />}
@@ -1966,11 +1961,9 @@ const Game = (props) => {
                         {playedCardsPile && playedCardsPile.length > 0 && (
                           <img
                             className="Card"
-                            src={
-                              require(`../assets/cards-front/${
-                                playedCardsPile[playedCardsPile.length - 1]
-                              }.png`).default
-                            }
+                            src={`assets/cards-front/${
+                              playedCardsPile[playedCardsPile.length - 1]
+                            }.png`}
                           />
                         )}
                         <button
@@ -1997,10 +1990,7 @@ const Game = (props) => {
                             key={i}
                             className="Card"
                             onClick={() => onCardPlayedHandler(item)}
-                            src={
-                              require(`../assets/cards-front/${item}.png`)
-                                .default
-                            }
+                            src={`assets/cards-front/${item}.png`}
                           />
                         ))}
                       </div>
