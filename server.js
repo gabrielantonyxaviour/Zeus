@@ -93,13 +93,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("accept", async (payload, callback) => {
-    const { opponentSocketId, roomCode, bet } = payload;
+    const { opponentSocketId, roomCode, bet, senderSocketId } = payload;
     const { newGame } = await addGame({ room: roomCode, bet });
     console.log(newGame);
     console.log(payload);
     io.to(opponentSocketId).emit("accept", {
       roomCode,
       bet,
+      senderSocketId,
     });
   });
 

@@ -7,6 +7,7 @@ import { Polybase } from "@polybase/client";
 
 import Homepage from "./pages/Homepage";
 import Game from "./pages/Game";
+import Staking from "./pages/Staking";
 import AvailableGames from "./pages/AvailableGames";
 import YourProfile from "./pages/YourProfile";
 import YourFriends from "./pages/YourFriends";
@@ -23,6 +24,7 @@ const App = () => {
         {/* ... your app routes */}
         <Route exact path="/" component={Homepage} />
         <Route exact path="/play" component={Game} />
+        <Route exact path="/stake" component={Staking} />
         <Route exact path="/profile/:address" component={YourProfile} />
         <Route exact path="/friends/:address" component={YourFriends} />
         <Route exact path="/games" component={AvailableGames} />

@@ -143,16 +143,17 @@ const AvailableGames = () => {
       setShowModel(true);
     });
 
-    socket.on("accept", async ({ roomCode, bet }) => {
+    socket.on("accept", async ({ roomCode, bet, senderSocketId }) => {
       try {
         const newGameResponse = await polybase
           .collection("Games")
-          .create([address, String(socket.id), bet]);
-        console.log("New Game Response: ", newGameResponse);
+          .record(String(senderSocketId))
+          .call("setRoomCode", [roomCode]);
+        console.log("Setting Room Code for", newGameResponse);
       } catch (err) {
         console.error(err.message);
       }
-      window.location = `/play?roomCode=${roomCode}`;
+      window.location = `/stake?roomCode=${roomCode}`;
     });
   }, []);
 
@@ -246,12 +247,6 @@ const AvailableGames = () => {
                         name: val.data.profile.name,
                         bet: val.data.bet,
                       });
-                      console.log({
-                        accepterSocketId: socket.id,
-                        creatorSocketId: val.data.socketid,
-                        name: val.data.profile.name,
-                        bet: val.data.bet,
-                      });
                     }}
                   >{`Stake 💸 ${val.data.bet} TST `}</button>
                 </div>
@@ -273,6 +268,7 @@ const AvailableGames = () => {
             opponentSocketId: offerSocketId,
             roomCode,
             bet,
+            senderSocketId: socket.id,
           });
           window.location = `/play?roomCode=${roomCode}`;
           setShowModel(false);
