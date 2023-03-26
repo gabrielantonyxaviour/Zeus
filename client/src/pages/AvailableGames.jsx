@@ -117,15 +117,18 @@ const AvailableGames = () => {
     return function cleanup() {
       socket.disconnect();
 
+      // delete game record
       (async function () {
+        console.log("Deleting game record", offerSocketId);
         await polybase
           .collection("Games")
-          .record(socket.id)
+          .record(offerSocketId)
           .call("del", [])
           .catch((err) => {
             console.error(err);
           });
       })();
+
       //shut down connnection instance
       socket.off();
     };
@@ -133,6 +136,7 @@ const AvailableGames = () => {
 
   useEffect(() => {
     socket.on("popup", ({ from, name, bet }) => {
+      console.log("popup", from, name, bet);
       setOfferSocketId(from);
       setOfferName(name);
       setOfferPrice(bet);
@@ -143,7 +147,7 @@ const AvailableGames = () => {
       try {
         const newGameResponse = await polybase
           .collection("Games")
-          .create([roomCode, address, String(socket.id), bet]);
+          .create([address, String(socket.id), bet]);
         console.log("New Game Response: ", newGameResponse);
       } catch (err) {
         console.error(err.message);
@@ -239,13 +243,13 @@ const AvailableGames = () => {
                       socket.emit("offer", {
                         accepterSocketId: socket.id,
                         creatorSocketId: val.data.socketid,
-                        name: val.data.profile.wallet_address,
+                        name: val.data.profile.name,
                         bet: val.data.bet,
                       });
                       console.log({
                         accepterSocketId: socket.id,
                         creatorSocketId: val.data.socketid,
-                        name: val.data.profile.wallet_address,
+                        name: val.data.profile.name,
                         bet: val.data.bet,
                       });
                     }}

@@ -9,7 +9,7 @@ const YourProfile = () => {
   const [loading, setLoading] = useState(true);
 
   const [profile, setProfile] = useState({
-    address: address,
+    wallet_address: address,
     image: "https://picsum.photos/200",
     name: "Anonymous",
     description: "I am a newbie in this game",
@@ -28,7 +28,18 @@ const YourProfile = () => {
         setProfile(profile_data.data);
         setLoading(false);
       } catch (e) {
-        console.log(e);
+        if (e.code === "not-found") {
+          const profile_data = await polybase
+            .collection("Profiles")
+            .create([
+              profile.wallet_address,
+              profile.name,
+              profile.image,
+              profile.description,
+            ]);
+          console.log("Profile created", profile_data);
+        }
+        console.log(e.code);
         setLoading(false);
       }
     })();

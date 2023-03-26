@@ -10,7 +10,7 @@ const db = new Polybase({
   // const data = await db.collection("Users").where("room", "==", room).get();
   const data = await db
     .collection("Games")
-    .record("VcUqUQMKaocHlWPrAAAV")
+    .record("CUmObdduSzgJqnXuAABi")
     .call("del", []);
 
   console.log(data.data);
