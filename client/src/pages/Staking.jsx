@@ -7,6 +7,9 @@ import {
   OxReceiverUNO_ABI,
   OxSenderUNO_ABI,
 } from "../contract/constants";
+import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { ethers } from "ethers";
+
 const Staking = (props) => {
   const polybase = usePolybase();
   const { address } = useAccount();
@@ -56,18 +59,18 @@ const Staking = (props) => {
           setGameNotFound(true);
         } else {
           setGameNotFound(false);
-          let gameRecord = games.data[0].data;
-          console.log(gameRecord);
+          let gameData = games.data[0].data;
+          console.log(gameData);
 
-          setGameData(gameRecord);
+          setGameData(gameData);
 
-          if (gameRecord.player1_address === address) {
+          if (gameData.player1_address === address) {
             console.log("You are player one");
-          } else if (gameRecord.player2_address === address) {
+          } else if (gameData.player2_address === address) {
             console.log("You are player two");
           } else {
             console.log("You are not a player");
-            // window.location.href = "/games";
+            window.location.href = "/games";
           }
         }
       } catch (err) {
@@ -77,8 +80,36 @@ const Staking = (props) => {
   }, []);
 
   useEffect(() => {
-    //
+    // TODO
+    if (stakeReturnDataIsSuccess) {
+      (async function () {
+        const updatedGame = await polybase
+          .collection("Games")
+          .record(gameData.id)
+          .call("setStake", [address]);
+
+        console.log(updatedGame);
+      })();
+    }
   }, [stakeReturnDataIsSuccess]);
+
+  useEffect(() => {
+    (async function () {
+      await polybase
+        .collection("Games")
+        .record(gameData.id)
+        .onSnapshot(
+          (newDoc) => {
+            // Handle the change
+            console.log(newDoc);
+            // setGameData({ ...gameData, newDoc });
+          },
+          (err) => {
+            // Optional error handler
+          }
+        );
+    })();
+  }, []);
 
   return (
     <div className="Homepage select-none">
@@ -91,12 +122,12 @@ const Staking = (props) => {
           </div>
         </div>
         <div className="flex justify-between w-[60%] mx-auto">
-          <p className="text-white my-auto">{gameRecord.player1_name}</p>
-          {stakeReturnDataIsSuccess && gameRecord.player1_address == address ? (
+          <p className="text-white my-auto">{gameData.player1_name}</p>
+          {stakeReturnDataIsSuccess && gameData.player1_address == address ? (
             <button className="game-button green" style={{ cursor: "default" }}>
               Staked ✅
             </button>
-          ) : gameRecord.player2_address == address ? (
+          ) : gameData.player2_address == address ? (
             <button
               className="game-button orange"
               onClick={() => {
