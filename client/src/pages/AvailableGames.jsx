@@ -92,12 +92,11 @@ const AvailableGames = () => {
         const games_data = await polybase.collection("Games").get();
 
         for (let i = 0; i < games_data.data.length; i++) {
-          const profile_address = games_data.data[i].profile;
           const profile_data = await polybase
             .collection("Profiles")
-            .record(profile_address)
+            .record(games_data.data[i].data.profile)
             .get();
-          games_data.data[i].profile = profile_data.data;
+          games_data.data[i].data.profile = profile_data.data;
         }
 
         setGames(games_data.data);
@@ -201,7 +200,7 @@ const AvailableGames = () => {
         >
           {games.map((val, index) => {
             let image = "https://picsum.photos/200";
-            let address = val.data.profile;
+            let address = val.data.profile.wallet_address;
 
             return (
               <div className="flex justify-center" key={index}>
@@ -230,13 +229,13 @@ const AvailableGames = () => {
                       socket.emit("offer", {
                         accepterSocketId: socket.id,
                         creatorSocketId: val.data.socketid,
-                        name: val.data.profile,
+                        name: val.data.profile.wallet_address,
                         bet: val.data.bet,
                       });
                       console.log({
                         accepterSocketId: socket.id,
                         creatorSocketId: val.data.socketid,
-                        name: profile.name,
+                        name: val.data.profile.wallet_address,
                         bet: val.data.bet,
                       });
                     }}
