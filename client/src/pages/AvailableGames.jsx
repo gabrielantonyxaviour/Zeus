@@ -113,9 +113,19 @@ const AvailableGames = () => {
       transports: ["websocket"],
     });
 
-    //cleanup on component unmount
+    // cleanup on component unmount
     return function cleanup() {
       socket.disconnect();
+
+      (async function () {
+        await polybase
+          .collection("Games")
+          .record(socket.id)
+          .call("del", [])
+          .catch((err) => {
+            console.error(err);
+          });
+      })();
       //shut down connnection instance
       socket.off();
     };
