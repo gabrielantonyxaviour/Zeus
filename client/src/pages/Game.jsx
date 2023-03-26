@@ -15,15 +15,9 @@ import draw2CardSound from "../assets/sounds/draw2-sound.mp3";
 import wildCardSound from "../assets/sounds/wild-sound.mp3";
 import draw4CardSound from "../assets/sounds/draw4-sound.mp3";
 import gameOverSound from "../assets/sounds/game-over-sound.mp3";
-import { useNetwork } from "wagmi";
+
 import { usePrepareContractWrite } from "wagmi";
 import { usePolybase } from "@polybase/react";
-import { ethers } from "ethers";
-import {
-  apiUrls,
-  contractAddress,
-  OxReceiverUNO_ABI,
-} from "../contract/constants";
 //NUMBER CODES FOR ACTION CARDS
 //SKIP - 404
 //DRAW 2 - 252
@@ -38,7 +32,6 @@ const Game = (props) => {
   const data = queryString.parse(props.location.search);
   const { address } = useAccount();
   const polybase = usePolybase();
-  const { chain } = useNetwork();
 
   //initialize socket state
   const [room, setRoom] = useState(data.roomCode);
@@ -93,8 +86,7 @@ const Game = (props) => {
   const [playGameOverSound] = useSound(gameOverSound);
 
   useEffect(() => {
-    (async () => {
-      console.log("Creating provider...");
+    console.log("Creating provider...");
       const provider = new ethers.providers.JsonRpcProvider(
         apiUrls[chain.id],
         chain.id
@@ -112,18 +104,19 @@ const Game = (props) => {
       );
       console.log("Ending Game...");
 
-      if (winner == "Player 1") {
-        await OxReceiverUNO.endGame(
-          room,
-          users.find((user) => user.name === "Player 1").address
-        );
-      } else if (winner == "Player 2") {
-        await OxReceiverUNO.endGame(
-          room,
-          users.find((user) => user.name === "Player 2").address
-        );
-      }
-    })();
+    if (winner == "Player 1") {
+      
+      await OxReceiverUNO.endGame(
+       roomCode,
+       users.find((user)=>user.name==="Player 1").address
+      );
+    } else if (winner == "Player 2") {
+
+      await OxReceiverUNO.endGame(
+       roomCode,
+       users.find((user)=>user.name==="Player 2").address
+      );
+    }
   }, [winner]);
   //runs once on component mount
   useEffect(() => {
