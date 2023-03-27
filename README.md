@@ -1,7 +1,7 @@
 <h1 align="center">0xUNO</h1>
 <h2 align="center">Two player online game of UNO</h2>
-<h2 align="center">Play now at at https://0xuno.vercel.app/</h2>
-
+<h2 align="center">Play now at https://0xuno.vercel.app/</h2>
+<h2 align="center">Contracts at https://github.com/gabrielantonyxaviour/0xuno_contracts/</h2>
 
 
 <img src="client/src/assets/logo.png" alt="UNO Logo" width="33%" align="center" />
