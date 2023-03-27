@@ -30,20 +30,20 @@ UNO is a very popular game and my main motive towards building this project is t
 
 ## What it does
 
-The dApp allows users to create profiles and create games if they have enough TST tokens to stake. Once a player creates a game, another player can offer to play with him. If the other player accepts the offer, a room code is assigned and both players are required to stake the decided amount. Once both the players stake their TST tokens in the smart contract, the game begins. The cards are shuffled using ThunderCore's Random Number Generator. And the winner of the game is rewarded with TST tokens by the smart contract.
+This project contains a frontend where a user interacts to create his profile and get signed up to play the game. The player can either create a new bet in the Games Dashboard or he can accept the bet created by some other user. If the other user also accepts the offer they will move to a Staking page. In this page both the players are expected to stake to start the game. After both of them completed their stake, they will be directed to the Game page where they play the UNO game.  
 
 ## How we built it
 
-I built the frontend with React+TailwindCSS. My backend architecture consists of socket.io for multiplayer game play, chat messaging and match initialization. New games created are stored in a Postgresql database and the backend server is built with react for both the database and socket.io. I deployed my smart contract which handles the staking and winner rewarding mechanism in ThunderCore Testnet.
+We built the front end with React + TailwindCSS. Our backend architecture consists of socket.io for multiplayer gameplay, chat messaging and match initialization. New games created are stored in a Polybase data solution and the backend server is built with react for the database and socket.io. We deployed our smart contract which handles the staking and winner-rewarding mechanism in 5 different chains making us a multi-chain P2E game - Taiko, Gnosis, Mumbai Testnet and the Scroll Chain. We implemented cross-chain gameplay feature with Connext where a user can play with an opponent in Mumbai Testnet from Goerli Testnet.
 
 ## Challenges we ran into
 
-I ran into a lot of challenges with Socket.io since it was not working most of the time and failed to connect with the server causing a lot of time wasted into fixing it. ThunderCore was amazing and since it was EVM compatible I found no problem with integrating with my application.
+I ran into a lot of challenges with Socket.io since it was not working most of the time and failed to connect with the server causing a lot of time wasted into fixing it. The experience and seamless integrations was amazing and since it was EVM compatible I found no problem with integrating with my application.
 
 ## Accomplishments that we're proud of
 
 I am proud of building my application which is fully functional. Even though some parts might break in my dApp, it is a successful prototype that functions the entire workflow without any issues and I'm proud of that accomplishment.
 
-## What's next for Zeus
+## What's next for 0xUNO
 
 Looking foward to add fiat onramping to stake tokens and play the game so that I could onboard more web2 users to this game. Also the UI / UX needs to fine tuned to make it production ready.
