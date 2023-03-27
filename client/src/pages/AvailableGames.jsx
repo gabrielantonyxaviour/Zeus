@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAccount, useBalance, useNetwork } from "wagmi";
 import GameOfferPopUpModel from "../components/GameOfferPopUpModel";
@@ -18,58 +18,6 @@ let socket;
 // const ENDPOINT = process.env.REACT_APP_SOCKET_URL || "http://localhost:8080";
 const ENDPOINT = "http://localhost:8080";
 
-const sampleData = [
-  {
-    id: 1,
-    address: "0xE2172c474F2E95419754140d4ac19045A70Bc93F",
-    name: "Gabriel",
-    profile: "https://picsum.photos/200/200",
-    bet: 3,
-  },
-  {
-    id: 2,
-    address: "0x2994E3240D7bb19A890a449A5dc8DDC374d3C08a",
-    name: "Benita",
-    profile: "https://picsum.photos/200/200",
-    bet: 12,
-  },
-  {
-    id: 3,
-    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-    name: "Jasmine",
-    profile: "https://picsum.photos/200/200",
-    bet: 30,
-  },
-  {
-    id: 3,
-    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-    name: "Jasmine",
-    profile: "https://picsum.photos/200/200",
-    bet: 30,
-  },
-  {
-    id: 3,
-    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-    name: "Jasmine",
-    profile: "https://picsum.photos/200/200",
-    bet: 30,
-  },
-  {
-    id: 3,
-    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-    name: "Jasmine",
-    profile: "https://picsum.photos/200/200",
-    bet: 30,
-  },
-  {
-    id: 3,
-    address: "0x1D902011c8b17de771165f116095B3307cFb33F4",
-    name: "Marshmallow",
-    profile: "https://picsum.photos/200/200",
-    bet: 30,
-  },
-];
-
 const AvailableGames = () => {
   // Get prfile data from Polybase
   const polybase = usePolybase();
@@ -84,9 +32,12 @@ const AvailableGames = () => {
   const [profile, setProfile] = useState({});
 
   const { address } = useAccount();
+
+  // eslint-disable-next-line no-unused-vars
   const { data: balance, isFetched } = useBalance({
     address,
   });
+
   const { chain } = useNetwork();
 
   useEffect(() => {
@@ -134,7 +85,7 @@ const AvailableGames = () => {
       //shut down connnection instance
       socket.off();
     };
-  }, []);
+  });
 
   useEffect(() => {
     socket.on("popup", ({ from, name, bet }) => {
@@ -155,8 +106,10 @@ const AvailableGames = () => {
           .call("setRoomCode", [
             roomCode,
             address,
-            profile?.name || "Annonyms",
+            profile?.name || "Anonymous",
           ]);
+
+        console.log("Setting Room Code:", newGameResponse);
 
         console.log("Creating provider...");
         const provider = new ethers.providers.JsonRpcProvider(
@@ -196,7 +149,7 @@ const AvailableGames = () => {
       window.location = `/stake?roomCode=${roomCode}`;
     });
     console.log("Succesfully staked");
-  }, []);
+  });
 
   return (
     <div className="Homepage select-none">

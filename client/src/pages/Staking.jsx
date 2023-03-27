@@ -15,6 +15,8 @@ import { ethers } from "ethers";
 const Staking = (props) => {
   const polybase = usePolybase();
   const { address } = useAccount();
+
+  // eslint-disable-next-line no-unused-vars
   const { data: balance, isFetched } = useBalance({
     address,
   });
@@ -24,12 +26,13 @@ const Staking = (props) => {
 
   const [gameData, setGameData] = useState(null);
   const [gameNotFound, setGameNotFound] = useState(true);
+
   const { config: stakeConfig } = usePrepareContractWrite({
     address: contractAddress[chain.id],
-    abi: chain.id == 5 ? OxSenderUNO_ABI : OxReceiverUNO_ABI,
-    functionName: chain.id == 5 ? "xStake" : "stake",
+    abi: chain.id === 5 ? OxSenderUNO_ABI : OxReceiverUNO_ABI,
+    functionName: chain.id === 5 ? "xStake" : "stake",
     args:
-      chain.id == 5
+      chain.id === 5
         ? [
             ethers.utils.hexlify(ethers.utils.toUtf8Bytes(roomCode)),
             ethers.utils.parseEther("0.0001"),
@@ -47,12 +50,15 @@ const Staking = (props) => {
       console.log("Error", error);
     },
   });
+
   const {
     data: stakeReturnData,
     isLoading: stakeReturnDataIsLoading,
     isSuccess: stakeReturnDataIsSuccess,
     write: stake,
   } = useContractWrite(stakeConfig);
+
+  console.log("stakeReturnData", stakeReturnData, stakeReturnDataIsLoading);
   useEffect(() => {
     console.log(ethers.utils.hexlify(ethers.utils.toUtf8Bytes(roomCode)));
     (async function () {
@@ -65,6 +71,9 @@ const Staking = (props) => {
 
         if (games.data.length === 0) {
           setGameNotFound(true);
+          if (gameNotFound) {
+            window.location.href = "/games";
+          }
         } else {
           setGameNotFound(false);
           let gameData = games.data[0].data;
@@ -85,7 +94,7 @@ const Staking = (props) => {
         console.error(err);
       }
     })();
-  }, []);
+  });
 
   useEffect(() => {
     if (stakeReturnDataIsSuccess) {
@@ -100,7 +109,7 @@ const Staking = (props) => {
         setGameData(updatedGame.data);
       })();
     }
-  }, [stakeReturnDataIsSuccess]);
+  }, [stakeReturnDataIsSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     (async function () {
@@ -130,7 +139,7 @@ const Staking = (props) => {
         window.location = `/play?roomCode=${roomCode}`;
       }
     })();
-  }, [gameData]);
+  }, [gameData]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     (function () {
       polybase
@@ -153,7 +162,7 @@ const Staking = (props) => {
           }
         );
     })();
-  }, []);
+  });
 
   return (
     <div className="Homepage select-none">
@@ -169,14 +178,14 @@ const Staking = (props) => {
             </div>
             <div className="flex justify-between w-[60%] mx-auto">
               <p className="text-white my-auto">{gameData.player1_name}</p>
-              {gameData?.player1_isStaked == true ? (
+              {gameData?.player1_isStaked === true ? (
                 <button
                   className="game-button green"
                   style={{ cursor: "default" }}
                 >
                   Staked ✅
                 </button>
-              ) : gameData.player1_address == address ? (
+              ) : gameData.player1_address === address ? (
                 <button
                   className="game-button orange"
                   onClick={() => {
@@ -196,14 +205,14 @@ const Staking = (props) => {
             </div>
             <div className="flex justify-between w-[60%] mx-auto">
               <p className="text-white my-auto">{gameData.player2_name}</p>
-              {gameData?.player2_isStaked == true ? (
+              {gameData?.player2_isStaked === true ? (
                 <button
                   className="game-button green"
                   style={{ cursor: "default" }}
                 >
                   Staked ✅
                 </button>
-              ) : gameData.player2_address == address ? (
+              ) : gameData.player2_address === address ? (
                 <button
                   className="game-button orange"
                   onClick={() => {

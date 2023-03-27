@@ -5,7 +5,7 @@ import io from "socket.io-client";
 import queryString from "query-string";
 import Spinner from "./Spinner";
 import useSound from "use-sound";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount } from "wagmi";
 
 import bgMusic from "../assets/sounds/game-bg-music.mp3";
 import unoSound from "../assets/sounds/uno-sound.mp3";
@@ -16,8 +16,15 @@ import wildCardSound from "../assets/sounds/wild-sound.mp3";
 import draw4CardSound from "../assets/sounds/draw4-sound.mp3";
 import gameOverSound from "../assets/sounds/game-over-sound.mp3";
 
-import { usePrepareContractWrite } from "wagmi";
+import { useNetwork } from "wagmi";
 import { usePolybase } from "@polybase/react";
+import { ethers } from "ethers";
+
+import {
+  contractAddress,
+  apiUrls,
+  OxReceiverUNO_ABI,
+} from "../contract/constants";
 //NUMBER CODES FOR ACTION CARDS
 //SKIP - 404
 //DRAW 2 - 252
@@ -29,18 +36,19 @@ const ENDPOINT = "http://localhost:8080";
 // const ENDPOINT = "https://uno-online-multiplayer.herokuapp.com/";
 
 const Game = (props) => {
+  const chain = useNetwork();
   const data = queryString.parse(props.location.search);
   const { address } = useAccount();
+  // eslint-disable-next-line no-unused-vars
   const polybase = usePolybase();
 
   //initialize socket state
-  const [room, setRoom] = useState(data.roomCode);
+  const [room, setRoom] = useState(data.roomCode); // eslint-disable-line no-unused-vars
   const [roomFull, setRoomFull] = useState(false);
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [gameData, setGameData] = useState({});
 
   useEffect(() => {
     const connectionOptions = {
@@ -52,11 +60,11 @@ const Game = (props) => {
     socket = io.connect(ENDPOINT, connectionOptions);
 
     socket.emit("join", { room: room, address: address }, (error) => {
-      if (error !== "Already in" && error != undefined) {
+      if (error !== "Already in" && error !== undefined) {
         setRoomFull(true);
       }
     });
-  }, []);
+  });
 
   //initialize game state
   const [gameOver, setGameOver] = useState(true);
@@ -84,43 +92,10 @@ const Game = (props) => {
   const [playGameOverSound] = useSound(gameOverSound);
 
   useEffect(() => {
-<<<<<<< HEAD
-    console.log("Creating provider...");
-      const provider = new ethers.providers.JsonRpcProvider(
-        apiUrls[chain.id],
-        chain.id
-      );
-      console.log("Creating signer...");
-      const signer = new ethers.Wallet(
-        process.env.REACT_APP_PRIVATE_KEY,
-        provider
-      );
-      console.log("Creating contract...");
-      const OxReceiverUNO = new ethers.Contract(
-        contractAddress[chain.id],
-        OxReceiverUNO_ABI,
-        signer
-      );
-      console.log("Ending Game...");
-
-    if (winner == "Player 1") {
-      
-      await OxReceiverUNO.endGame(
-       roomCode,
-       users.find((user)=>user.name==="Player 1").address
-      );
-    } else if (winner == "Player 2") {
-
-      await OxReceiverUNO.endGame(
-       roomCode,
-       users.find((user)=>user.name==="Player 2").address
-      );
-    }
-=======
     (async () => {
       console.log("Ending Game...");
 
-      if (winner == "Player 1") {
+      if (winner === "Player 1") {
         console.log("Creating provider...");
         const provider = new ethers.providers.JsonRpcProvider(
           apiUrls[chain.id],
@@ -141,7 +116,7 @@ const Game = (props) => {
           room,
           users.find((user) => user.name === "Player 1").address
         );
-      } else if (winner == "Player 2") {
+      } else if (winner === "Player 2") {
         console.log("Creating provider...");
         const provider = new ethers.providers.JsonRpcProvider(
           apiUrls[chain.id],
@@ -164,8 +139,7 @@ const Game = (props) => {
         );
       }
     })();
->>>>>>> 21c96ebc2eab365d522d27b992b05276c1544b2d
-  }, [winner]);
+  }, [winner]); // eslint-disable-line react-hooks/exhaustive-deps
   //runs once on component mount
   useEffect(() => {
     //shuffle PACK_OF_CARDS array
@@ -287,7 +261,7 @@ const Game = (props) => {
       const chatBody = document.querySelector(".chat-body");
       chatBody.scrollTop = chatBody.scrollHeight;
     });
-  }, []);
+  });
 
   //some util functions
   const checkGameOver = (arr) => {
@@ -322,6 +296,7 @@ const Game = (props) => {
   const onCardPlayedHandler = (played_card) => {
     //extract player who played the card
     const cardPlayedBy = turn;
+    // eslint-disable-next-line default-case
     switch (played_card) {
       //if card played was a number card
       case "0R":
@@ -1303,8 +1278,10 @@ const Game = (props) => {
         }
         break;
       }
+
       //if card played was a draw four wild card
       case "D4W":
+        // eslint-disable-next-line no-lone-blocks
         {
           //check who played the card and return new state accordingly
           if (cardPlayedBy === "Player 1") {
@@ -1813,7 +1790,7 @@ const Game = (props) => {
       {!roomFull ? (
         <>
           <div className="topInfo">
-            <img src={"assets/logo.png"} />
+            <img src={"assets/logo.png"} alt="logo" />
             <h1>Game Code: {room}</h1>
             <span>
               <button
@@ -1877,6 +1854,7 @@ const Game = (props) => {
                         {player2Deck.map((item, i) => (
                           <img
                             key={i}
+                            alt="card"
                             className="Card"
                             onClick={() => onCardPlayedHandler(item)}
                             src={"assets/card-back.png"}
@@ -1901,6 +1879,7 @@ const Game = (props) => {
                         {playedCardsPile && playedCardsPile.length > 0 && (
                           <img
                             className="Card"
+                            alt="card"
                             src={`assets/cards-front/${
                               playedCardsPile[playedCardsPile.length - 1]
                             }.png`}
@@ -1929,6 +1908,7 @@ const Game = (props) => {
                           <img
                             key={i}
                             className="Card"
+                            alt="card"
                             onClick={() => onCardPlayedHandler(item)}
                             src={`assets/cards-front/${item}.png`}
                           />
@@ -1956,18 +1936,13 @@ const Game = (props) => {
                           </div>
                           <div className="chat-body">
                             <div className="msg-insert">
-                              {messages.map((msg) => {
-                                if (msg.user === "Player 2")
-                                  return (
-                                    <div className="msg-receive">
-                                      {msg.text}
-                                    </div>
-                                  );
-                                if (msg.user === "Player 1")
-                                  return (
-                                    <div className="msg-send">{msg.text}</div>
-                                  );
-                              })}
+                              {messages.map((msg) =>
+                                msg.user === "Player 2" ? (
+                                  <div className="msg-receive">{msg.text}</div>
+                                ) : (
+                                  <div className="msg-send">{msg.text}</div>
+                                )
+                              )}
                             </div>
                             <div className="chat-text">
                               <input
@@ -1999,6 +1974,7 @@ const Game = (props) => {
                         {player1Deck.map((item, i) => (
                           <img
                             key={i}
+                            alt="card"
                             className="Card"
                             onClick={() => onCardPlayedHandler(item)}
                             src={`assets/card-back.png`}
@@ -2023,6 +1999,7 @@ const Game = (props) => {
                         {playedCardsPile && playedCardsPile.length > 0 && (
                           <img
                             className="Card"
+                            alt="card"
                             src={`assets/cards-front/${
                               playedCardsPile[playedCardsPile.length - 1]
                             }.png`}
@@ -2050,6 +2027,7 @@ const Game = (props) => {
                         {player2Deck.map((item, i) => (
                           <img
                             key={i}
+                            alt="card"
                             className="Card"
                             onClick={() => onCardPlayedHandler(item)}
                             src={`assets/cards-front/${item}.png`}
@@ -2078,18 +2056,13 @@ const Game = (props) => {
                           </div>
                           <div className="chat-body">
                             <div className="msg-insert">
-                              {messages.map((msg) => {
-                                if (msg.user === "Player 1")
-                                  return (
-                                    <div className="msg-receive">
-                                      {msg.text}
-                                    </div>
-                                  );
-                                if (msg.user === "Player 2")
-                                  return (
-                                    <div className="msg-send">{msg.text}</div>
-                                  );
-                              })}
+                              {messages.map((msg) =>
+                                msg.user === "Player 1" ? (
+                                  <div className="msg-receive">{msg.text}</div>
+                                ) : (
+                                  <div className="msg-send">{msg.text}</div>
+                                )
+                              )}
                             </div>
                             <div className="chat-text">
                               <input
