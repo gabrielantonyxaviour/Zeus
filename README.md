@@ -1,7 +1,6 @@
 <h1 align="center">0xUNO</h1>
 <h2 align="center">Two player online game of UNO</h2>
 <h2 align="center">Play now at https://0xuno.vercel.app/</h2>
-<h2 align="center">Contracts at https://github.com/gabrielantonyxaviour/0xuno_contracts/</h2>
 
 
 <img src="client/src/assets/logo.png" alt="UNO Logo" width="33%" align="center" />
@@ -13,6 +12,15 @@ UNO is the classic and beloved card game that’s easy to pick up and impossible
 ## ⚠️ Game Rules
 
 Read the complete rules of UNO [here](https://www.unorules.com/).
+
+<h2 align="center">Contracts at https://github.com/gabrielantonyxaviour/0xuno_contracts/</h2>
+
+ - MUMBAI_CONTRACT_ADDRESS = "0x31a70eb8990ccc7fdb4f96a62f5c1aa6e314c88b";
+ - CHIADO_CONTRACT_ADDRESS = "0x16CBC6Cb38D19B73A3b545109c70b2031d20EA37";
+ - TAIKO_CONTRACT_ADDRESS = "0x16CBC6Cb38D19B73A3b545109c70b2031d20EA37";
+ - SCROLL_CONTRACT_ADDRESS = "0xC044FCe37927A0Cb55C7e57425Fe3772181228a6"; 
+ - GOERLI_CONTRACT_ADDRESS = "0xF1D62f668340323a6533307Bb0e44600783BE5CA";
+ - GNOSIS_CONRACT_ADDRESS = "0x16CBC6Cb38D19B73A3b545109c70b2031d20EA37";
 
 ## 🎮 Screenshots
 
