@@ -225,6 +225,17 @@ const Staking = (props) => {
         ) : (
           <p>Loading...</p>
         )}
+        {gameData?.player1_isStaked === true &&
+          gameData?.player2_isStaked === true && (
+            <button
+              className="game-button green"
+              onClick={() => {
+                window.location = `/play?roomCode=${roomCode}`;
+              }}
+            >
+              Start Game
+            </button>
+          )}
       </div>
     </div>
   );
